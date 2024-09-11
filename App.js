@@ -47,7 +47,6 @@ export default function App() {
         {/* <Stack.Screen name="Home" component={HomeScreen} /> */}
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Sign Up" component={SignupScreen} />
-        {/* Place the Tab navigator inside the Stack navigator */}
 
         <Stack.Screen name="Home" component={Tabs} options={{ headerShown: false }} />
 
