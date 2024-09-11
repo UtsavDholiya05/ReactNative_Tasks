@@ -83,7 +83,7 @@ export default function HomeScreen({ navigation }) {
             <Text style={styles.error}>{error}</Text>
           </View>
         ) : (
-          <FlatList
+          <FlatList 
             data={movies}
             keyExtractor={(item) => item.id.toString()}
             renderItem={renderMovieItem}
