@@ -1,10 +1,15 @@
-import {  View ,TextInput , StyleSheet } from "react-native";
+import {  View ,TextInput , StyleSheet ,ImageBackground} from "react-native";
 
 
 export default function FavouriteScreen() {
     return(
-        <View style={styles.container}>
+        <View>
+          <ImageBackground
+        source={require("../assets/m2.png")}
+        style={styles.backgroundImage}
+      >
             <TextInput style={styles.input} placeholder="User Profile"/>
+          </ImageBackground>
         </View>
     );
 }
@@ -12,19 +17,23 @@ export default function FavouriteScreen() {
 const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: "#f5f5f5",
-      paddingHorizontal: 20,
-      justifyContent: "center",
+      // backgroundColor: "#f5f5f5",
+      // paddingHorizontal: 20,
     },
     input: {
         height: 50,
         width: "90%",
         alignSelf: "center",
-        borderColor: "#ddd",
-        backgroundColor: "rgb(220,220,220)",
-        marginBottom: 15,
+        alignContent:"center",
+        justifyContent:"center",
+        // borderColor: "#ddd",
+        backgroundColor: "#fff",
         paddingHorizontal: 10,
-        marginVertical: 10,
+        marginVertical: "auto",
         borderRadius: 100,
+      }, 
+      backgroundImage: {
+        height: "100%",
+        width: "100%",
       },
     });

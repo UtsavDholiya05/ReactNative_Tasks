@@ -140,14 +140,15 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     textAlign: "center",
-    marginVertical: 16,
-
+    marginBottom: 30,
+    marginTop: 10,
     color: "#fff",
   },
   loader: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    
   },
   center: {
     flex: 1,
