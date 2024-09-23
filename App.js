@@ -8,8 +8,9 @@ import SignupScreen from "./Screens/SignupScreen";
 import { Ionicons } from "@expo/vector-icons";
 import ProfileScreen from "./Screens/ProfileScreen";
 import FavouriteScreen from "./Screens/FavouriteScreen";
-
-
+import { UserProvider } from "./Context/Login";
+import { FavProvider } from "./Context/favorite";
+// import EditProfile from "./Screens/EditProfile";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -28,7 +29,7 @@ function Tabs() {
           } else if (route.name === "Profile") {
             iconName = focused ? "person" : "person-outline";
           }
-        
+
           return <Ionicons name={iconName} size={size} color={color} />;
         },
       })}
@@ -36,21 +37,31 @@ function Tabs() {
       <Tab.Screen name="Popular Movies" component={HomeScreen} />
       <Tab.Screen name="Favourite" component={FavouriteScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
+
+      
     </Tab.Navigator>
   );
 }
 
 export default function App() {
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="Home">
-        {/* <Stack.Screen name="Home" component={HomeScreen} /> */}
-        <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="Sign Up" component={SignupScreen} />
+    <UserProvider>
+      <FavProvider>
+        <NavigationContainer>
+          <Stack.Navigator initialRouteName="Home">
+            {/* <Stack.Screen name="Home" component={HomeScreen} /> */}
+            <Stack.Screen name="Login" component={LoginScreen} />
+            <Stack.Screen name="Sign Up" component={SignupScreen} />
+            {/* <Stack.Screen name="Sign Up" component={SignupScreen} /> */}
 
-        <Stack.Screen name="Home" component={Tabs} options={{ headerShown: false }} />
-
-      </Stack.Navigator>
-    </NavigationContainer>
+            <Stack.Screen
+              name="Home"
+              component={Tabs}
+              options={{ headerShown: false }}
+            />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </FavProvider>
+    </UserProvider>
   );
 }

@@ -11,7 +11,7 @@ import {
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-const API_KEY = '4e5572039c914d1e01b8204518c64978'; 
+const API_KEY = "4e5572039c914d1e01b8204518c64978";
 const API_URL = `https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}&language=en-US&page=1`;
 
 export default function HomeScreen({ navigation }) {
@@ -52,38 +52,44 @@ export default function HomeScreen({ navigation }) {
         style={styles.backgroundImage}
       >
         <View style={styles.h}>
-            <Text style={styles.text}>Welcome!</Text>
+          <Text style={styles.text}>Welcome!</Text>
 
-            <View style={styles.viewButton}>
-              <TouchableOpacity style={styles.buttonTO}>
-                <Text
-                  style={styles.buttonText}
-                  onPress={() => navigation.navigate("Login")}
-                >
-                  Login
-                </Text>
-              </TouchableOpacity>
-            </View>
+          <View style={styles.viewButton}>
+            <TouchableOpacity style={styles.buttonTO}>
+              <Text
+                style={styles.buttonText}
+                onPress={() => navigation.navigate("Login")}
+              >
+                Login
+              </Text>
+            </TouchableOpacity>
+          </View>
 
-            <View style={styles.viewButton}>
-              <TouchableOpacity style={styles.buttonTO}>
-                <Text
-                  style={styles.buttonText}
-                  onPress={() => navigation.navigate("Sign Up")}
-                >
-                  Sign Up
-                </Text>
-              </TouchableOpacity>
-            </View>
+          <View style={styles.viewButton}>
+            <TouchableOpacity style={styles.buttonTO}>
+              <Text
+                style={styles.buttonText}
+                onPress={() => navigation.navigate("Sign Up")}
+              >
+                Sign Up
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
         <Text style={styles.header}>Movie Recommendations</Text>
 
-        {loading ? (<View style={styles.loader}><ActivityIndicator size="large" color="#0000ff" /></View>) : error ? (<View style={styles.center}>
-            <Text style={styles.error}>{error}</Text>
+        {loading ? (
+          <View style={styles.loader}>
+            <ActivityIndicator size="large" color="#0000ff" />
+          </View>
+        ) : error ? (
+          <View style={styles.center}>
+            {" "}
+            <Text style={styles.error}>{error}</Text>{" "}
           </View>
         ) : (
-          <FlatList 
+          <FlatList
             data={movies}
             keyExtractor={(item) => item.id.toString()}
             renderItem={renderMovieItem}
@@ -130,11 +136,11 @@ const styles = StyleSheet.create({
     // alignSelf: "center",
     textAlign: "center",
     fontSize: 18,
-    fontWeight:"bold",
+    fontWeight: "bold",
     backgroundColor: "#fff",
     paddingTop: "25%",
     borderTopRightRadius: 15,
-    borderBottomLeftRadius : 15,
+    borderBottomLeftRadius: 15,
   },
   header: {
     fontSize: 24,
@@ -148,7 +154,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    
   },
   center: {
     flex: 1,
@@ -161,6 +166,7 @@ const styles = StyleSheet.create({
   },
   list: {
     paddingBottom: 20,
+    // backgroundColor: "white"
   },
   movieItem: {
     flexDirection: "row",
@@ -180,9 +186,9 @@ const styles = StyleSheet.create({
     flexShrink: 1,
     color: "#fff",
   },
-  h:{
-    display:"flex",
-    flexDirection:"row",
+  h: {
+    display: "flex",
+    flexDirection: "row",
     // width:"100%"
-  }
+  },
 });
