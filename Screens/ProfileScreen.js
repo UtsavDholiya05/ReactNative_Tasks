@@ -27,11 +27,12 @@ export default function ProfileScreen() {
         <Image source={{ uri: profilePhoto }} style={styles.profilePicture} />
         <Text style={styles.name}>{name}</Text>
         <Text style={styles.email}>{email}</Text>
-        <TouchableOpacity style={styles.buttonTO}>
-              <Text
-                style={styles.buttonText}
-                onPress={() => navigation.navigate("EditProfile")}
-              >Edit Profile</Text>
+
+        <TouchableOpacity
+          style={styles.buttonTO}
+          onPress={() => navigation.navigate("ProfileComponent")}  
+        >
+          <Text style={styles.buttonText}>Edit Profile</Text>
         </TouchableOpacity>
       </ImageBackground>
     </View>

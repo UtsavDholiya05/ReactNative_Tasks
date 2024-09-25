@@ -9,8 +9,8 @@ import { Ionicons } from "@expo/vector-icons";
 import ProfileScreen from "./Screens/ProfileScreen";
 import FavouriteScreen from "./Screens/FavouriteScreen";
 import { UserProvider } from "./Context/Login";
-import { FavProvider } from "./Context/favorite";
-// import EditProfile from "./Screens/EditProfile";
+import { FavoritesProvider } from "./Context/EditFavorite";
+import EditProfile from "./Screens/EditProfile";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -37,31 +37,41 @@ function Tabs() {
       <Tab.Screen name="Popular Movies" component={HomeScreen} />
       <Tab.Screen name="Favourite" component={FavouriteScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
-
-      
     </Tab.Navigator>
+  );
+}
+
+function ProfileComponent() {
+  return (
+    // <NavigationContainer>
+      <Stack.Navigator>
+        {/* <Stack.Screen name="Profile" component={ProfileScreen} /> */}
+        <Stack.Screen name="EditProfile" component={EditProfile} />
+      </Stack.Navigator>
+    // </NavigationContainer>
   );
 }
 
 export default function App() {
   return (
     <UserProvider>
-      <FavProvider>
+      <FavoritesProvider>
         <NavigationContainer>
           <Stack.Navigator initialRouteName="Home">
             {/* <Stack.Screen name="Home" component={HomeScreen} /> */}
             <Stack.Screen name="Login" component={LoginScreen} />
             <Stack.Screen name="Sign Up" component={SignupScreen} />
-            {/* <Stack.Screen name="Sign Up" component={SignupScreen} /> */}
-
+            
             <Stack.Screen
               name="Home"
               component={Tabs}
               options={{ headerShown: false }}
             />
+
+            <Stack.Screen name="ProfileComponent" component={ProfileComponent}/>
           </Stack.Navigator>
         </NavigationContainer>
-      </FavProvider>
+      </FavoritesProvider>
     </UserProvider>
   );
 }
