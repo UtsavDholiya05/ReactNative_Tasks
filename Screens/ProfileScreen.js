@@ -6,16 +6,32 @@ import {
   Image,
   Text,
   Button,
-  TouchableOpacity
+  TouchableOpacity,
 } from "react-native";
 import React, { useContext } from "react";
 import { UserContext } from "../Context/Login"; 
-import { useNavigation } from "@react-navigation/native"; 
-
+import { useNavigation } from "@react-navigation/native";
+import * as ImagePicker from "expo-image-picker";
 
 export default function ProfileScreen() {
-  const { profilePhoto, name, email } = useContext(UserContext); 
-  const navigation = useNavigation(); 
+  const { user, setUser } = useContext(UserContext); 
+  const navigation = useNavigation();
+
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setUser((prevUser) => ({
+        ...prevUser,
+        profilePhoto: result.assets[0].uri, // Use result.assets[0].uri if you're using the latest Expo ImagePicker API
+      }));
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -24,13 +40,24 @@ export default function ProfileScreen() {
         style={styles.backgroundImage}
       >
         <TextInput style={styles.input} placeholder="User Profile" />
-        <Image source={{ uri: profilePhoto }} style={styles.profilePicture} />
-        <Text style={styles.name}>{name}</Text>
-        <Text style={styles.email}>{email}</Text>
+
+        {user.profilePhoto ? (
+          <Image
+            source={{ uri: user.profilePhoto }}
+            style={styles.profilePhoto}
+          />
+        ) : (
+          <Text style={styles.input}>No profile photo selected</Text>
+        )}
+
+        <Text style={styles.input}>Name: {user.Name}</Text>
+        <Text style={styles.input}>Email: {user.email}</Text>
+        
+        <Button title="Change Profile Picture" onPress={pickImage} />
 
         <TouchableOpacity
           style={styles.buttonTO}
-          onPress={() => navigation.navigate("ProfileComponent")}  
+          onPress={() => navigation.navigate("ProfileComponent")}
         >
           <Text style={styles.buttonText}>Edit Profile</Text>
         </TouchableOpacity>
@@ -58,18 +85,10 @@ const styles = StyleSheet.create({
     height: "100%",
     width: "100%",
   },
-  profilePicture: {
+  profilePhoto: {
     width: 100,
     height: 100,
     borderRadius: 50,
-  },
-  name: {
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-  email: {
-    fontSize: 16,
-    color: "white",
   },
   buttonTO: {
     paddingVertical: 20,
@@ -82,8 +101,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     backgroundColor: "#fff",
-    color:"black",
-    // paddingTop: "25%",
+    color: "black",
     borderTopRightRadius: 15,
     borderBottomLeftRadius: 15,
     padding: 10,

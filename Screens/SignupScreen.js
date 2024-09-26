@@ -5,8 +5,11 @@ import {
   View,
   ImageBackground,
   TouchableOpacity,
+  Button,
 } from "react-native";
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { UserContext } from "../Context/Login";
+import * as ImagePicker from "expo-image-picker";
 
 export default function SignupScreen({ navigation }) {
   const [email, setEmail] = useState("");
@@ -15,10 +18,13 @@ export default function SignupScreen({ navigation }) {
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [confirmpasswordError, setconfirmpasswordError] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [firstNameError, setFirstNameError] = useState("");
-  const [number, setNumber] = useState("");
-  const [numberError, setNumberError] = useState("");
+  const [Name, setName] = useState("");
+  const [NameError, setNameError] = useState("");
+  // const [number, setNumber] = useState("");
+  // const [numberError, setNumberError] = useState("");
+  const [profilePhoto, setprofilePhoto] = useState(null);
+
+
 
   // Email validation regex
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -28,7 +34,7 @@ export default function SignupScreen({ navigation }) {
     setEmailError("");
     setPasswordError("");
     setconfirmpasswordError("");
-    setFirstNameError("");
+    setNameError("");
 
     // Email validation
     if (!emailRegex.test(email)) {
@@ -48,17 +54,17 @@ export default function SignupScreen({ navigation }) {
       valid = false;
     }
 
-    if (!firstName) {
-      setFirstNameError("First name required");
+    if (!Name) {
+      setNameError("First name required");
       valid = false;
     }
 
-    if (number.length !== 10) {
-      setNumberError(
-        "Invalid contact number. Please enter a 10-digit contact number"
-      );
-      valid = false;
-    }
+    // if (number.length !== 10) {
+    //   setNumberError(
+    //     "Invalid contact number. Please enter a 10-digit contact number"
+    //   );
+    //   valid = false;
+    // }
 
     return valid;
   };
@@ -66,7 +72,26 @@ export default function SignupScreen({ navigation }) {
   const handleSubmit = () => {
     if (validateInputs()) {
       alert("Sign up Successful!");
+      const userData = { Name, email, profilePhoto };
+      setUser(userData);
       navigation.navigate("Home");
+    }
+  };
+
+  const { user, setUser } = useContext(UserContext);
+
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      if (!result.canceled) {
+        setUser({ ...user, profilePhoto: result.assets[0].uri });
+      }
     }
   };
 
@@ -85,7 +110,7 @@ export default function SignupScreen({ navigation }) {
             fontWeight: "bold",
             marginBottom: 15,
             marginTop: 10,
-            alignSelf: "center"
+            alignSelf: "center",
           }}
         >
           Create a new account
@@ -95,14 +120,12 @@ export default function SignupScreen({ navigation }) {
           style={styles.input}
           placeholder="Your Name"
           onChangeText={(text) => {
-            setFirstName(text);
-            setFirstNameError("");
+            setName(text);
+            setNameError("");
           }}
         />
 
-        {firstNameError ? (
-          <Text style={styles.errorText}>{firstNameError}</Text>
-        ) : null}
+        {NameError ? <Text style={styles.errorText}>{NameError}</Text> : null}
 
         <TextInput
           style={styles.input}
@@ -116,7 +139,7 @@ export default function SignupScreen({ navigation }) {
 
         {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
 
-        <TextInput
+        {/* <TextInput
           style={styles.input}
           placeholder="Contact Number"
           keyboardType="number-pad"
@@ -128,7 +151,7 @@ export default function SignupScreen({ navigation }) {
 
         {numberError ? (
           <Text style={styles.errorText}>{numberError}</Text>
-        ) : null}
+        ) : null} */}
 
         <TextInput
           style={styles.input}
@@ -158,6 +181,9 @@ export default function SignupScreen({ navigation }) {
           <Text style={styles.errorText}>{confirmpasswordError}</Text>
         ) : null}
 
+        <Button title="Profile Picture" onPress={pickImage} />
+
+        {profilePhoto && <Image source={{ uri: profilePhoto }} style={{ width: 100, height: 100 }} />}
         <View
           style={{
             display: "flex",
@@ -167,7 +193,14 @@ export default function SignupScreen({ navigation }) {
             justifyContent: "center",
           }}
         >
-          <Text style={{ color: "#fff", fontSize: 14, fontWeight:"bold",marginTop: 4 }}>
+          <Text
+            style={{
+              color: "#fff",
+              fontSize: 14,
+              fontWeight: "bold",
+              marginTop: 4,
+            }}
+          >
             By sigining in, you agree to our{" "}
           </Text>
           <Text
@@ -193,9 +226,7 @@ export default function SignupScreen({ navigation }) {
           }}
         >
           <Text style={{ color: "#fff", fontSize: 14 }}>and </Text>
-          <Text
-            style={{ color: "red", fontSize: 14, fontWeight: "bold" }}
-          >
+          <Text style={{ color: "red", fontSize: 14, fontWeight: "bold" }}>
             Privacy Policy
           </Text>
         </View>
@@ -208,13 +239,11 @@ export default function SignupScreen({ navigation }) {
               !email ||
               !password ||
               !confirmpassword ||
-              !firstName ||
-              !number ||
+              !Name ||
               emailError ||
               passwordError ||
               confirmpasswordError ||
-              firstNameError ||
-              numberError
+              NameError
             }
           >
             <Text style={styles.buttonText}>Sign up</Text>
@@ -229,14 +258,25 @@ export default function SignupScreen({ navigation }) {
           }}
         >
           <Text
-            style={{ color: "#fff", fontSize: 16, fontWeight: "bold", marginVertical: 15 }}
+            style={{
+              color: "#fff",
+              fontSize: 16,
+              fontWeight: "bold",
+              marginVertical: 15,
+            }}
           >
             Already have an account?
           </Text>
 
           <TouchableOpacity>
             <Text
-              style={{ color: "#fff", fontSize: 16, fontWeight: "bold", marginLeft: 3, marginVertical: 15 }}
+              style={{
+                color: "#fff",
+                fontSize: 16,
+                fontWeight: "bold",
+                marginLeft: 3,
+                marginVertical: 15,
+              }}
               onPress={() => navigation.navigate("Login")}
             >
               {" "}

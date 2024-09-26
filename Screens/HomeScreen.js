@@ -1,3 +1,5 @@
+// HomeScreen.js
+import React, { useEffect, useState, useContext } from "react";
 import {
   View,
   Text,
@@ -8,8 +10,9 @@ import {
   Image,
   ActivityIndicator,
 } from "react-native";
-import React, { useEffect, useState } from "react";
 import axios from "axios";
+import Icon from "react-native-vector-icons/Ionicons"; 
+import { FavoritesContext } from "../Context/EditFavorite"; 
 
 const API_KEY = "4e5572039c914d1e01b8204518c64978";
 const API_URL = `https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}&language=en-US&page=1`;
@@ -18,6 +21,8 @@ export default function HomeScreen({ navigation }) {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const { addToFavorites, removeFromFavorites, isFavorite } = useContext(FavoritesContext); 
 
   useEffect(() => {
     fetchMovies();
@@ -35,15 +40,33 @@ export default function HomeScreen({ navigation }) {
     }
   };
 
-  const renderMovieItem = ({ item }) => (
-    <View style={styles.movieItem}>
-      <Image
-        source={{ uri: `https://image.tmdb.org/t/p/w500${item.poster_path}` }}
-        style={styles.poster}
-      />
-      <Text style={styles.title}>{item.title}</Text>
-    </View>
-  );
+  const renderMovieItem = ({ item }) => {
+    const favorite = isFavorite(item.id); 
+
+    return (
+      <View style={styles.movieItem}>
+        <Image
+          source={{ uri: `https://image.tmdb.org/t/p/w500${item.poster_path}` }}
+          style={styles.poster}
+        />
+        <Text style={styles.title}>{item.title}</Text>
+
+        
+        <TouchableOpacity
+          onPress={() =>
+            favorite ? removeFromFavorites(item.id) : addToFavorites(item)
+          }
+        >
+          <Icon
+            name={favorite ? "heart" : "heart-outline"}
+            size={24}
+            color={favorite ? "red" : "white"}
+            style={styles.heartIcon}
+          />
+        </TouchableOpacity>
+      </View>
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -79,14 +102,14 @@ export default function HomeScreen({ navigation }) {
 
         <Text style={styles.header}>Movie Recommendations</Text>
 
+        {/* Loader and error handling */}
         {loading ? (
           <View style={styles.loader}>
             <ActivityIndicator size="large" color="#0000ff" />
           </View>
         ) : error ? (
           <View style={styles.center}>
-            {" "}
-            <Text style={styles.error}>{error}</Text>{" "}
+            <Text style={styles.error}>{error}</Text>
           </View>
         ) : (
           <FlatList
@@ -111,7 +134,6 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 33,
-    // fontWeight: "bold",
     marginBottom: 40,
     textAlign: "center",
     color: "#fff",
@@ -119,8 +141,6 @@ const styles = StyleSheet.create({
     marginLeft: 20,
   },
   viewButton: {
-    // justifyContent: "center",
-    // alignItems: "center",
     marginHorizontal: 16,
     marginVertical: 5,
     height: 70,
@@ -133,7 +153,6 @@ const styles = StyleSheet.create({
   buttonText: {
     height: 55,
     width: "130%",
-    // alignSelf: "center",
     textAlign: "center",
     fontSize: 18,
     fontWeight: "bold",
@@ -166,7 +185,6 @@ const styles = StyleSheet.create({
   },
   list: {
     paddingBottom: 20,
-    // backgroundColor: "white"
   },
   movieItem: {
     flexDirection: "row",
@@ -189,6 +207,8 @@ const styles = StyleSheet.create({
   h: {
     display: "flex",
     flexDirection: "row",
-    // width:"100%"
+  },
+  heartIcon: {
+    marginLeft: "auto",
   },
 });

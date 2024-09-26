@@ -11,7 +11,7 @@ import {
 import { FavoritesContext } from "../Context/EditFavorite";
 
 export default function FavoritesScreen() {
-  const { favorites, removeFavorite } = useContext(FavoritesContext);
+  const { favorites, removeFromFavorite } = useContext(FavoritesContext);
 
   return (
     <View style={styles.container}>
@@ -36,9 +36,10 @@ export default function FavoritesScreen() {
               <Text style={styles.movieTitle}>{item.title}</Text>
               <Button
                 title="Remove"
-                onPress={() => removeFavorite(item.id)}
+                onPress={() => removeFromFavorite(item.id)} // Correctly access the remove function
                 color="#ff6347"
               />
+
             </View>
           )}
         />

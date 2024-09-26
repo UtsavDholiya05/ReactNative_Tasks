@@ -13,15 +13,15 @@ const EditProfile = () => {
       aspect: [1, 1],
       quality: 1,
     });
-z
+
     if (!result.canceled) {
-      setUser({ ...user, profilePicture: result.uri });
+      setUser({ ...user, profilePhoto: result.uri });
     }
   };
 
   return (
     <View>
-      <Image source={{ uri: user.profilePicture }} style={{ width: 100, height: 100, borderRadius: 50 }} />
+      <Image source={{ uri: user.profilePhoto }} style={{ width: 100, height: 100, borderRadius: 50 }} />
       <Button title="Change Profile Picture" onPress={pickImage} />
     </View>
   );
