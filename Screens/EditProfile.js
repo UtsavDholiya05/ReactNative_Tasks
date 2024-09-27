@@ -1,10 +1,10 @@
-import React, { useContext } from 'react';
-import { View, Button, Image } from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
-import { UserContext } from '../Context/Login';
+import React, { useContext } from "react";
+import { View, Button, Image } from "react-native";
+import * as ImagePicker from "expo-image-picker";
+import { UserContext } from "../Context/Login";
 
 const EditProfile = () => {
-  const { user, setUser } = useContext(UserContext);
+  const { user, setUser } = useCont-ext(UserContext);
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -21,7 +21,10 @@ const EditProfile = () => {
 
   return (
     <View>
-      <Image source={{ uri: user.profilePhoto }} style={{ width: 100, height: 100, borderRadius: 50 }} />
+      <Image
+        source={{ uri: user.profilePhoto }}
+        style={{ width: 100, height: 100, borderRadius: 50 }}
+      />
       <Button title="Change Profile Picture" onPress={pickImage} />
     </View>
   );

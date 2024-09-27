@@ -6,28 +6,26 @@ import {
   Button,
   StyleSheet,
   ImageBackground,
-  TextInput,
 } from "react-native";
 import { FavoritesContext } from "../Context/EditFavorite";
 
 export default function FavoritesScreen() {
-  const { favorites, removeFromFavorite } = useContext(FavoritesContext);
+  const { favorites, removeFromFavorites } = useContext(FavoritesContext);
 
   return (
     <View style={styles.container}>
-      {/* Background Image */}
       <ImageBackground
         source={require("../assets/m2.png")}
         style={styles.backgroundImage}
       >
-        {/* Input field for design */}
-        <TextInput
+        {/* <TextInput
           style={styles.input}
           placeholder="Favorites will be displayed here"
           editable={false}
-        />
+        /> */}
 
-        {/* FlatList to display favorite movies */}
+        <Text style={styles.text}>Favorite Movies</Text>
+
         <FlatList
           data={favorites}
           keyExtractor={(item) => item.id.toString()}
@@ -36,10 +34,9 @@ export default function FavoritesScreen() {
               <Text style={styles.movieTitle}>{item.title}</Text>
               <Button
                 title="Remove"
-                onPress={() => removeFromFavorite(item.id)} // Correctly access the remove function
+                onPress={() => removeFromFavorites(item.id)}
                 color="#ff6347"
               />
-
             </View>
           )}
         />
@@ -75,8 +72,7 @@ const styles = StyleSheet.create({
     padding: 15,
     marginBottom: 15,
     borderRadius: 8,
-    elevation: 3, // shadow for Android
-    shadowColor: "#000", // shadow for iOS
+    elevation: 3, 
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
@@ -87,5 +83,13 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     marginBottom: 10,
+  },
+  text: {
+    color: "black",
+    alignSelf: "center",
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 30,
+    margin: 20,
   },
 });

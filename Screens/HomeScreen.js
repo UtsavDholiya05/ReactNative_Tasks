@@ -1,4 +1,3 @@
-// HomeScreen.js
 import React, { useEffect, useState, useContext } from "react";
 import {
   View,
@@ -11,8 +10,9 @@ import {
   ActivityIndicator,
 } from "react-native";
 import axios from "axios";
-import Icon from "react-native-vector-icons/Ionicons"; 
-import { FavoritesContext } from "../Context/EditFavorite"; 
+import Icon from "react-native-vector-icons/Ionicons";
+import { FavoritesContext } from "../Context/EditFavorite";
+import { UserContext } from "../Context/Login";
 
 const API_KEY = "4e5572039c914d1e01b8204518c64978";
 const API_URL = `https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}&language=en-US&page=1`;
@@ -21,8 +21,10 @@ export default function HomeScreen({ navigation }) {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { user, setUser } = useContext(UserContext);
 
-  const { addToFavorites, removeFromFavorites, isFavorite } = useContext(FavoritesContext); 
+  const { addToFavorites, removeFromFavorites, isFavorite } =
+    useContext(FavoritesContext);
 
   useEffect(() => {
     fetchMovies();
@@ -41,7 +43,7 @@ export default function HomeScreen({ navigation }) {
   };
 
   const renderMovieItem = ({ item }) => {
-    const favorite = isFavorite(item.id); 
+    const favorite = isFavorite(item.id);
 
     return (
       <View style={styles.movieItem}>
@@ -51,7 +53,6 @@ export default function HomeScreen({ navigation }) {
         />
         <Text style={styles.title}>{item.title}</Text>
 
-        
         <TouchableOpacity
           onPress={() =>
             favorite ? removeFromFavorites(item.id) : addToFavorites(item)
@@ -71,11 +72,21 @@ export default function HomeScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <ImageBackground
-        source={require("../assets/m2.png")}
+        source={require("../t/WhatsApp Image 2024-09-26 at 19.24.54_9de2ef77.jpg")}
         style={styles.backgroundImage}
+        // resizeMode="repeat"
       >
         <View style={styles.h}>
-          <Text style={styles.text}>Welcome!</Text>
+          {/* <Text style={styles.text}>Welcome!</Text> */}
+
+          {user.profilePhoto ? (
+            <Image
+              source={{ uri: user.profilePhoto }}
+              style={styles.profilePhoto}
+            />
+          ) : (
+            <Text style={styles.textWelcome}>Welcome!</Text>
+          )}
 
           <View style={styles.viewButton}>
             <TouchableOpacity style={styles.buttonTO}>
@@ -131,6 +142,7 @@ const styles = StyleSheet.create({
   backgroundImage: {
     height: "100%",
     width: "100%",
+    // resizeMode: "cover"
   },
   text: {
     fontSize: 33,
@@ -140,19 +152,25 @@ const styles = StyleSheet.create({
     marginTop: 30,
     marginLeft: 20,
   },
+  textWelcome: {
+    fontSize: 33,
+    marginBottom: 40,
+    textAlign: "center",
+    color: "#fff",
+    marginTop: 40,
+    marginLeft: 20,
+  },
   viewButton: {
-    marginHorizontal: 16,
-    marginVertical: 5,
-    height: 70,
     marginHorizontal: 20,
-    width: 60,
+    marginVertical: 5,
+    width: 70,
   },
   buttonTO: {
-    paddingVertical: 20,
+    paddingVertical: 30,
   },
   buttonText: {
     height: 55,
-    width: "130%",
+    width: "100%",
     textAlign: "center",
     fontSize: 18,
     fontWeight: "bold",
@@ -210,5 +228,14 @@ const styles = StyleSheet.create({
   },
   heartIcon: {
     marginLeft: "auto",
+  },
+  profilePhoto: {
+    width: 90,
+    height: 90,
+    borderRadius: 50,
+    marginVertical: 15,
+    marginLeft: 30,
+    marginRight: 10,
+    marginTop: 20,
   },
 });

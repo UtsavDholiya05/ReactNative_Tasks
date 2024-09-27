@@ -5,7 +5,7 @@ import {
   View,
   ImageBackground,
   TouchableOpacity,
-  Button,
+  Alert
 } from "react-native";
 import { useContext, useState } from "react";
 import { UserContext } from "../Context/Login";
@@ -23,8 +23,6 @@ export default function SignupScreen({ navigation }) {
   // const [number, setNumber] = useState("");
   // const [numberError, setNumberError] = useState("");
   const [profilePhoto, setprofilePhoto] = useState(null);
-
-
 
   // Email validation regex
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -69,14 +67,14 @@ export default function SignupScreen({ navigation }) {
     return valid;
   };
 
-  const handleSubmit = () => {
-    if (validateInputs()) {
-      alert("Sign up Successful!");
-      const userData = { Name, email, profilePhoto };
-      setUser(userData);
-      navigation.navigate("Home");
-    }
-  };
+  // const handleSubmit = () => {
+  //   if (validateInputs()) {
+  //     alert("Sign up Successful!");
+  //     const userData = { Name, email, profilePhoto };
+  //     setUser(userData);
+  //     navigation.navigate("Home");
+  //   }
+  // };
 
   const { user, setUser } = useContext(UserContext);
 
@@ -89,9 +87,22 @@ export default function SignupScreen({ navigation }) {
     });
 
     if (!result.canceled) {
-      if (!result.canceled) {
-        setUser({ ...user, profilePhoto: result.assets[0].uri });
-      }
+      setprofilePhoto(result.assets[0].uri); // Set the local state with the image URI
+
+      Alert.alert(
+        "Photo Uploaded",
+        "Your profile picture has been successfully uploaded!",
+        [{ text: "OK" }]
+      );
+    }
+  };
+
+  const handleSubmit = () => {
+    if (validateInputs()) {
+      alert("Sign up Successful!");
+      const userData = { Name, email, profilePhoto }; // Include profilePhoto here
+      setUser(userData); // Update the user context with the new data
+      navigation.navigate("Home");
     }
   };
 
@@ -115,6 +126,11 @@ export default function SignupScreen({ navigation }) {
         >
           Create a new account
         </Text>
+
+        <TouchableOpacity style={styles.buttonPhoto} onPress={pickImage}>
+          <Text style={styles.textButton}> Upload Your Profile Photo</Text>
+          
+        </TouchableOpacity>
 
         <TextInput
           style={styles.input}
@@ -181,9 +197,6 @@ export default function SignupScreen({ navigation }) {
           <Text style={styles.errorText}>{confirmpasswordError}</Text>
         ) : null}
 
-        <Button title="Profile Picture" onPress={pickImage} />
-
-        {profilePhoto && <Image source={{ uri: profilePhoto }} style={{ width: 100, height: 100 }} />}
         <View
           style={{
             display: "flex",
@@ -235,16 +248,16 @@ export default function SignupScreen({ navigation }) {
           <TouchableOpacity
             style={styles.buttonTO}
             onPress={handleSubmit}
-            disabled={
-              !email ||
-              !password ||
-              !confirmpassword ||
-              !Name ||
-              emailError ||
-              passwordError ||
-              confirmpasswordError ||
-              NameError
-            }
+            // disabled={
+            //   !email ||
+            //   !password ||
+            //   !confirmpassword ||
+            //   !Name ||
+            //   emailError ||
+            //   passwordError ||
+            //   confirmpasswordError ||
+            //   NameError
+            // }
           >
             <Text style={styles.buttonText}>Sign up</Text>
           </TouchableOpacity>
@@ -293,8 +306,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f5f5f5",
-    paddingHorizontal: 20,
-    justifyContent: "center",
+    // paddingHorizontal: 20,
+    // justifyContent: "center",
   },
   form: {
     backgroundColor: "white",
@@ -350,5 +363,19 @@ const styles = StyleSheet.create({
     width: "90%",
     alignSelf: "center",
     marginLeft: 17,
+  },
+  buttonPhoto: {
+    backgroundColor: "#fff",
+    marginVertical: 10,
+    marginHorizontal: 20,
+    borderRadius: 100,
+  },
+  textButton: {
+    color: "black",
+    // margin: 15,
+    paddingVertical: 13,
+    paddingHorizontal: 5,
+    height: 45,
+    opacity: 0.6,
   },
 });

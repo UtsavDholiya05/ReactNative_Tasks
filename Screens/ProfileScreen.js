@@ -5,17 +5,15 @@ import {
   ImageBackground,
   Image,
   Text,
-  Button,
   TouchableOpacity,
 } from "react-native";
 import React, { useContext } from "react";
-import { UserContext } from "../Context/Login"; 
-import { useNavigation } from "@react-navigation/native";
+import { UserContext } from "../Context/Login";
 import * as ImagePicker from "expo-image-picker";
 
 export default function ProfileScreen() {
-  const { user, setUser } = useContext(UserContext); 
-  const navigation = useNavigation();
+  const { user, setUser } = useContext(UserContext);
+  
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -28,7 +26,7 @@ export default function ProfileScreen() {
     if (!result.canceled) {
       setUser((prevUser) => ({
         ...prevUser,
-        profilePhoto: result.assets[0].uri, // Use result.assets[0].uri if you're using the latest Expo ImagePicker API
+        profilePhoto: result.assets[0].uri, //result.assets[0].uri for latest Expo ImagePicker API
       }));
     }
   };
@@ -39,28 +37,40 @@ export default function ProfileScreen() {
         source={require("../assets/m2.png")}
         style={styles.backgroundImage}
       >
-        <TextInput style={styles.input} placeholder="User Profile" />
+        {/* <TextInput style={styles.input} placeholder="User Profile" /> */}
 
-        {user.profilePhoto ? (
+        {/* {user.profilePhoto ? (
           <Image
             source={{ uri: user.profilePhoto }}
             style={styles.profilePhoto}
           />
         ) : (
           <Text style={styles.input}>No profile photo selected</Text>
-        )}
-
+        )} */}
+        <View style={styles.photo}>
+          {user.profilePhoto ? (
+            <Image
+              source={{ uri: user.profilePhoto }}
+              style={styles.profilePhoto}
+            />
+          ) : (
+            <Text style={styles.input}>No profile photo selected</Text>
+          )}
+        </View>
         <Text style={styles.input}>Name: {user.Name}</Text>
-        <Text style={styles.input}>Email: {user.email}</Text>
-        
-        <Button title="Change Profile Picture" onPress={pickImage} />
 
-        <TouchableOpacity
-          style={styles.buttonTO}
-          onPress={() => navigation.navigate("ProfileComponent")}
-        >
-          <Text style={styles.buttonText}>Edit Profile</Text>
-        </TouchableOpacity>
+        <Text style={styles.input}>Email: {user.email}</Text>
+
+        {/* <Button title="Change Profile Picture" onPress={pickImage} /> */}
+        <View>
+          <TouchableOpacity
+            style={styles.buttonTO}
+            title="Change Profile Picture"
+            onPress={pickImage}
+          >
+            <Text style={styles.buttonText}>Edit Profile Photo</Text>
+          </TouchableOpacity>
+        </View>
       </ImageBackground>
     </View>
   );
@@ -77,8 +87,9 @@ const styles = StyleSheet.create({
     alignContent: "center",
     justifyContent: "center",
     backgroundColor: "#fff",
-    paddingHorizontal: 10,
-    marginVertical: "auto",
+    paddingVertical: 15,
+    paddingLeft: 9,
+    marginVertical: 20,
     borderRadius: 100,
   },
   backgroundImage: {
@@ -89,9 +100,11 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
+    marginVertical: 15,
   },
   buttonTO: {
     paddingVertical: 20,
+    
   },
   buttonText: {
     height: 40,
@@ -99,11 +112,14 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     textAlign: "center",
     fontSize: 18,
-    fontWeight: "bold",
-    backgroundColor: "#fff",
-    color: "black",
+    backgroundColor: "#3498db",
+    color: "#fff",
     borderTopRightRadius: 15,
     borderBottomLeftRadius: 15,
     padding: 10,
+  },
+  photo: {
+    alignSelf: "center",
+    marginTop: 40,
   },
 });
