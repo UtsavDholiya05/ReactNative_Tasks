@@ -109,7 +109,7 @@ export default function SignupScreen({ navigation }) {
   return (
     <View>
       <ImageBackground
-        source={require("../assets/m2.png")}
+        source={require("../t/WhatsApp Image 2024-09-28 at 21.29.25_158d91f3.jpg")}
         style={{ height: "100%", width: "100%" }}
       >
         <Text style={styles.txt}>Sign Up</Text>

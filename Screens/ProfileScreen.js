@@ -13,7 +13,6 @@ import * as ImagePicker from "expo-image-picker";
 
 export default function ProfileScreen() {
   const { user, setUser } = useContext(UserContext);
-  
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -34,7 +33,7 @@ export default function ProfileScreen() {
   return (
     <View style={styles.container}>
       <ImageBackground
-        source={require("../assets/m2.png")}
+        source={require("../t/WhatsApp Image 2024-09-28 at 21.29.25_158d91f3.jpg")}
         style={styles.backgroundImage}
       >
         {/* <TextInput style={styles.input} placeholder="User Profile" /> */}
@@ -54,7 +53,11 @@ export default function ProfileScreen() {
               style={styles.profilePhoto}
             />
           ) : (
-            <Text style={styles.input}>No profile photo selected</Text>
+            // <Text style={styles.input}>No profile photo selected</Text>
+            <Image
+              source={require("../t/ProfileLogo.png")}
+              style={styles.profilePhoto}
+            />
           )}
         </View>
         <Text style={styles.input}>Name: {user.Name}</Text>
@@ -104,7 +107,6 @@ const styles = StyleSheet.create({
   },
   buttonTO: {
     paddingVertical: 20,
-    
   },
   buttonText: {
     height: 40,

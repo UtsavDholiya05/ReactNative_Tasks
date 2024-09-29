@@ -15,7 +15,7 @@ export default function FavoritesScreen() {
   return (
     <View style={styles.container}>
       <ImageBackground
-        source={require("../assets/m2.png")}
+        source={require("../t/WhatsApp Image 2024-09-28 at 21.29.25_158d91f3.jpg")}
         style={styles.backgroundImage}
       >
         {/* <TextInput
@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
     padding: 15,
     marginBottom: 15,
     borderRadius: 8,
-    elevation: 3, 
+    elevation: 3,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 2,

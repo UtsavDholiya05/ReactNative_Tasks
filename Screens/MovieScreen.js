@@ -1,4 +1,3 @@
-
 import React, { useContext } from 'react';
 import { Button, View, Text } from 'react-native';
 import { FavoritesContext } from '../context/FavoritesContext';

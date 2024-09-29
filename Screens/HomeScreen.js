@@ -72,7 +72,7 @@ export default function HomeScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <ImageBackground
-        source={require("../t/WhatsApp Image 2024-09-26 at 19.24.54_9de2ef77.jpg")}
+        source={require("../t/WhatsApp Image 2024-09-28 at 21.29.25_158d91f3.jpg")}
         style={styles.backgroundImage}
         // resizeMode="repeat"
       >
