@@ -120,7 +120,7 @@ export default function LoginScreen({ navigation }) {
           <TouchableOpacity
             style={[styles.buttonTO]}
             onPress={handleSubmit}
-            // disabled={!email || !password || emailError || passwordError}
+            disabled={!email || !password || emailError || passwordError}
           >
             {/* emailempty,passwordempty,any email error,any passwword errod */}
 

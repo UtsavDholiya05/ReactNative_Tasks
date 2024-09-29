@@ -44,27 +44,26 @@ export default function HomeScreen({ navigation }) {
 
   const renderMovieItem = ({ item }) => {
     const favorite = isFavorite(item.id);
-
     return (
       <View style={styles.movieItem}>
         <Image
-          source={{ uri: `https://image.tmdb.org/t/p/w500${item.poster_path}` }}
+          source={{
+            uri: `https://image.tmdb.org/t/p/w500${item.poster_path}`,
+          }}
           style={styles.poster}
         />
-        <Text style={styles.title}>{item.title}</Text>
-
-        <TouchableOpacity
-          onPress={() =>
-            favorite ? removeFromFavorites(item.id) : addToFavorites(item)
-          }
-        >
+        <View style={styles.titleContainer}>
+          <Text style={styles.movieTitle}>{item.title}</Text>
           <Icon
             name={favorite ? "heart" : "heart-outline"}
-            size={24}
+            size={25}
             color={favorite ? "red" : "white"}
-            style={styles.heartIcon}
+            style={styles.icon}
+            onPress={() =>
+              favorite ? removeFromFavorites(item.id) : addToFavorites(item)
+            }
           />
-        </TouchableOpacity>
+        </View>
       </View>
     );
   };
@@ -242,5 +241,45 @@ const styles = StyleSheet.create({
     marginLeft: 30,
     marginRight: 10,
     marginTop: 20,
+  },
+  poster: {
+    width: 100,
+    height: 150,
+    borderRadius: 8,
+  },
+  backgroundImage: {
+    height: "100%",
+    width: "100%",
+    justifyContent: "center",
+  },
+  movieItem: {
+    padding: 15,
+    marginBottom: 15,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "white",
+    borderStyle: "solid",
+    elevation: 3,
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    alignSelf: "center",
+    width: "90%",
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  titleContainer: {
+    flex: 1,
+    marginLeft: 10, 
+    flexDirection: "row",
+    justifyContent: "space-between", 
+    alignItems: "center", 
+  },
+  movieTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#fff",
+    flex: 1, 
   },
 });

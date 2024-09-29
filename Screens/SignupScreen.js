@@ -5,7 +5,9 @@ import {
   View,
   ImageBackground,
   TouchableOpacity,
-  Alert
+  Alert,
+  ScrollView,
+  Image,
 } from "react-native";
 import { useContext, useState } from "react";
 import { UserContext } from "../Context/Login";
@@ -14,10 +16,10 @@ import * as ImagePicker from "expo-image-picker";
 export default function SignupScreen({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmpassword, setconfirmpassword] = useState("");
+  const [confirmpassword, setConfirmPassword] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
-  const [confirmpasswordError, setconfirmpasswordError] = useState("");
+  const [confirmpasswordError, setConfirmPasswordError] = useState("");
   const [Name, setName] = useState("");
   const [NameError, setNameError] = useState("");
   // const [number, setNumber] = useState("");
@@ -26,57 +28,63 @@ export default function SignupScreen({ navigation }) {
 
   // Email validation regex
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const { user, setUser } = useContext(UserContext);
 
-  const validateInputs = () => {
-    let valid = true;
-    setEmailError("");
-    setPasswordError("");
-    setconfirmpasswordError("");
-    setNameError("");
-
-    // Email validation
-    if (!emailRegex.test(email)) {
-      setEmailError("Please enter a valid email address");
-      valid = false;
+   const validateName = (name) => {
+    setName(name);
+    if (name.length < 3) {
+      setNameError("Name must be at least 3 characters long.");
+    } else {
+      setNameError("");
     }
-
-    // Password validation
-    if (password.length < 6) {
-      setPasswordError("Password must be at least 6 characters long");
-      valid = false;
-    }
-
-    //confirm password check
-    if (confirmpassword !== password) {
-      setconfirmpasswordError("Passwords do not match");
-      valid = false;
-    }
-
-    if (!Name) {
-      setNameError("First name required");
-      valid = false;
-    }
-
-    // if (number.length !== 10) {
-    //   setNumberError(
-    //     "Invalid contact number. Please enter a 10-digit contact number"
-    //   );
-    //   valid = false;
-    // }
-
-    return valid;
   };
 
-  // const handleSubmit = () => {
-  //   if (validateInputs()) {
-  //     alert("Sign up Successful!");
-  //     const userData = { Name, email, profilePhoto };
-  //     setUser(userData);
-  //     navigation.navigate("Home");
-  //   }
-  // };
+  const validateEmail = (email) => {
+    setEmail(email);
+    if (!emailRegex.test(email)) {
+      setEmailError("Please enter a valid email.");
+    } else {
+      setEmailError("");
+    }
+  };
 
-  const { user, setUser } = useContext(UserContext);
+  const validatePassword = (password) => {
+    setPassword(password);
+    if (password.length < 6) {
+      setPasswordError("Password must be at least 6 characters long.");
+    } else {
+      setPasswordError("");
+    }
+  };
+
+  const validateConfirmPassword = (confirmPassword) => {
+    setConfirmPassword(confirmPassword);
+    if (confirmPassword !== password) {
+      setConfirmPasswordError("Passwords do not match.");
+    } else {
+      setConfirmPasswordError("");
+    }
+  };
+
+  const handleSubmit = () => {
+
+    validateName(Name);
+    validateEmail(email);
+    validatePassword(password);
+    validateConfirmPassword(confirmpassword);
+
+    if (
+      !NameError &&
+      !emailError &&
+      !passwordError &&
+      !confirmpasswordError
+    ) {
+      alert("Sign up Successful!");
+      const userData = { Name, email, profilePhoto };
+      setUser(userData);
+      navigation.navigate("Home");
+    }
+  };
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -87,7 +95,7 @@ export default function SignupScreen({ navigation }) {
     });
 
     if (!result.canceled) {
-      setprofilePhoto(result.assets[0].uri); // Set the local state with the image URI
+      setprofilePhoto(result.assets[0].uri); 
 
       Alert.alert(
         "Photo Uploaded",
@@ -97,17 +105,8 @@ export default function SignupScreen({ navigation }) {
     }
   };
 
-  const handleSubmit = () => {
-    if (validateInputs()) {
-      alert("Sign up Successful!");
-      const userData = { Name, email, profilePhoto }; // Include profilePhoto here
-      setUser(userData); // Update the user context with the new data
-      navigation.navigate("Home");
-    }
-  };
-
   return (
-    <View>
+    <ScrollView>
       <ImageBackground
         source={require("../t/WhatsApp Image 2024-09-28 at 21.29.25_158d91f3.jpg")}
         style={{ height: "100%", width: "100%" }}
@@ -119,26 +118,28 @@ export default function SignupScreen({ navigation }) {
             color: "#D5F2E3",
             fontSize: 19,
             fontWeight: "bold",
-            marginBottom: 15,
-            marginTop: 10,
+            marginBottom: 10,
+            // marginTop: 10,
             alignSelf: "center",
           }}
         >
           Create a new account
         </Text>
 
-        <TouchableOpacity style={styles.buttonPhoto} onPress={pickImage}>
-          <Text style={styles.textButton}> Upload Your Profile Photo</Text>
-          
+        <TouchableOpacity onPress={pickImage}>
+          <View style={styles.profile}>
+            <Image
+              source={require("../t/ProfileLogo.png")}
+              style={styles.profilePhoto}
+            />
+            <Text style={styles.textButton}> Upload Your Profile Photo</Text>
+          </View>
         </TouchableOpacity>
 
         <TextInput
           style={styles.input}
           placeholder="Your Name"
-          onChangeText={(text) => {
-            setName(text);
-            setNameError("");
-          }}
+          onChangeText={validateName}
         />
 
         {NameError ? <Text style={styles.errorText}>{NameError}</Text> : null}
@@ -147,10 +148,7 @@ export default function SignupScreen({ navigation }) {
           style={styles.input}
           placeholder="Email-address"
           keyboardType="email-address"
-          onChangeText={(text) => {
-            setEmail(text);
-            setEmailError("");
-          }}
+          onChangeText={validateEmail}
         />
 
         {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
@@ -173,10 +171,7 @@ export default function SignupScreen({ navigation }) {
           style={styles.input}
           placeholder="Set password"
           secureTextEntry
-          onChangeText={(text) => {
-            setPassword(text);
-            setPasswordError("");
-          }}
+          onChangeText={validatePassword}
         ></TextInput>
 
         {passwordError ? (
@@ -187,10 +182,7 @@ export default function SignupScreen({ navigation }) {
           style={styles.input}
           placeholder="Confirm password"
           secureTextEntry
-          onChangeText={(text) => {
-            setconfirmpassword(text);
-            setconfirmpasswordError("");
-          }}
+          onChangeText={validateConfirmPassword}
         ></TextInput>
 
         {confirmpasswordError ? (
@@ -248,16 +240,16 @@ export default function SignupScreen({ navigation }) {
           <TouchableOpacity
             style={styles.buttonTO}
             onPress={handleSubmit}
-            // disabled={
-            //   !email ||
-            //   !password ||
-            //   !confirmpassword ||
-            //   !Name ||
-            //   emailError ||
-            //   passwordError ||
-            //   confirmpasswordError ||
-            //   NameError
-            // }
+            disabled={
+              !email ||
+              !password ||
+              !confirmpassword ||
+              !Name ||
+              emailError ||
+              passwordError ||
+              confirmpasswordError ||
+              NameError
+            }
           >
             <Text style={styles.buttonText}>Sign up</Text>
           </TouchableOpacity>
@@ -298,7 +290,7 @@ export default function SignupScreen({ navigation }) {
           </TouchableOpacity>
         </View>
       </ImageBackground>
-    </View>
+    </ScrollView>
   );
 }
 
@@ -338,7 +330,7 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
     fontSize: 30,
-    marginTop: 30,
+    marginTop: 20,
     marginBottom: 10,
   },
   viewButton: {
@@ -371,11 +363,18 @@ const styles = StyleSheet.create({
     borderRadius: 100,
   },
   textButton: {
-    color: "black",
-    // margin: 15,
-    paddingVertical: 13,
-    paddingHorizontal: 5,
-    height: 45,
-    opacity: 0.6,
+    color: "#fff",
+    fontSize: 18,
+    marginBottom: 10,
+  },
+  profilePhoto: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginVertical: 15,
+    alignSelf: "center",
+  },
+  profile: {
+    alignSelf: "center",
   },
 });
