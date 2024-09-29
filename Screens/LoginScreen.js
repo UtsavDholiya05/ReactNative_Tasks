@@ -136,14 +136,25 @@ export default function LoginScreen({ navigation }) {
           }}
         >
           <Text
-            style={{ color: "#fff", fontSize: 16, fontWeight: "bold", marginVertical: 20 }}
+            style={{
+              color: "#fff",
+              fontSize: 16,
+              fontWeight: "bold",
+              marginVertical: 20,
+            }}
           >
             Dont't have an account?
           </Text>
 
           <TouchableOpacity>
             <Text
-              style={{ color: "#fff", fontSize: 16, fontWeight: "bold", marginLeft: 3 , marginVertical: 20 }}
+              style={{
+                color: "#fff",
+                fontSize: 16,
+                fontWeight: "bold",
+                marginLeft: 3,
+                marginVertical: 20,
+              }}
               onPress={() => navigation.navigate("Sign Up")}
             >
               {" "}

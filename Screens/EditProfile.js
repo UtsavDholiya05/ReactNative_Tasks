@@ -4,7 +4,7 @@ import * as ImagePicker from "expo-image-picker";
 import { UserContext } from "../Context/Login";
 
 const EditProfile = () => {
-  const { user, setUser } = useCont-ext(UserContext);
+  const { user, setUser } = useContext(UserContext);
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({

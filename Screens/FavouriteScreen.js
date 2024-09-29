@@ -85,16 +85,16 @@ const styles = StyleSheet.create({
 
   titleContainer: {
     flex: 1,
-    marginLeft: 10, 
+    marginLeft: 10,
     flexDirection: "row",
-    justifyContent: "space-between", 
-    alignItems: "center", 
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   movieTitle: {
     fontSize: 18,
     fontWeight: "bold",
     color: "#fff",
-    flex: 1, 
+    flex: 1,
   },
   text: {
     color: "#fff",
@@ -104,6 +104,6 @@ const styles = StyleSheet.create({
     margin: 20,
   },
   icon: {
-    marginLeft: 10, 
+    marginLeft: 10,
   },
 });

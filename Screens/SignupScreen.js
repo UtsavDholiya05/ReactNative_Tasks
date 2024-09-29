@@ -30,7 +30,7 @@ export default function SignupScreen({ navigation }) {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const { user, setUser } = useContext(UserContext);
 
-   const validateName = (name) => {
+  const validateName = (name) => {
     setName(name);
     if (name.length < 3) {
       setNameError("Name must be at least 3 characters long.");
@@ -67,18 +67,12 @@ export default function SignupScreen({ navigation }) {
   };
 
   const handleSubmit = () => {
-
     validateName(Name);
     validateEmail(email);
     validatePassword(password);
     validateConfirmPassword(confirmpassword);
 
-    if (
-      !NameError &&
-      !emailError &&
-      !passwordError &&
-      !confirmpasswordError
-    ) {
+    if (!NameError && !emailError && !passwordError && !confirmpasswordError) {
       alert("Sign up Successful!");
       const userData = { Name, email, profilePhoto };
       setUser(userData);
@@ -95,7 +89,7 @@ export default function SignupScreen({ navigation }) {
     });
 
     if (!result.canceled) {
-      setprofilePhoto(result.assets[0].uri); 
+      setprofilePhoto(result.assets[0].uri);
 
       Alert.alert(
         "Photo Uploaded",
