@@ -76,20 +76,20 @@ export default function HomeScreen({ navigation }) {
         style={styles.backgroundImage}
         // resizeMode="repeat"
       >
-        <View style={styles.h}>
-          {/* <Text style={styles.text}>Welcome!</Text> */}
+        <View style={styles.header}>
+          <Text style={styles.text}>Welcome!</Text>
 
-          {user.profilePhoto ? (
+          {/* {user.profilePhoto ? (
             <Image
               source={{ uri: user.profilePhoto }}
               style={styles.profilePhoto}
             />
           ) : (
             <Text style={styles.textWelcome}>Welcome!</Text>
-          )}
+          )} */}
 
-          <View style={styles.viewButton}>
-            <TouchableOpacity style={styles.buttonTO}>
+          <View style={styles.ButtonView}>
+            <TouchableOpacity>
               <Text
                 style={styles.buttonText}
                 onPress={() => navigation.navigate("Login")}
@@ -99,8 +99,8 @@ export default function HomeScreen({ navigation }) {
             </TouchableOpacity>
           </View>
 
-          <View style={styles.viewButton}>
-            <TouchableOpacity style={styles.buttonTO}>
+          <View style={styles.ButtonView}>
+            <TouchableOpacity>
               <Text
                 style={styles.buttonText}
                 onPress={() => navigation.navigate("Sign Up")}
@@ -111,7 +111,7 @@ export default function HomeScreen({ navigation }) {
           </View>
         </View>
 
-        <Text style={styles.header}>Movie Recommendations</Text>
+        <Text style={styles.header2}>Movie Recommendations</Text>
 
         {/* Loader and error handling */}
         {loading ? (
@@ -144,47 +144,55 @@ const styles = StyleSheet.create({
     width: "100%",
     // resizeMode: "cover"
   },
+  // textWelcome: {
+  //   fontSize: 33,
+  //   marginBottom: 40,
+  //   textAlign: "center",
+  //   color: "#fff",
+  //   marginTop: 40,
+  //   marginLeft: 20,
+  // },
+
   text: {
     fontSize: 33,
-    marginBottom: 40,
+    marginBottom: 10,
     textAlign: "center",
     color: "#fff",
-    marginTop: 30,
+    marginTop: 20,
     marginLeft: 20,
   },
-  textWelcome: {
-    fontSize: 33,
-    marginBottom: 40,
-    textAlign: "center",
-    color: "#fff",
-    marginTop: 40,
-    marginLeft: 20,
+  header: {
+    display: "flex",
+    flexDirection: "row",
   },
-  viewButton: {
-    marginHorizontal: 20,
-    marginVertical: 5,
+  ButtonView: {
+    marginHorizontal: "auto",
+    // marginVertical: 5,
+    paddingVertical: 20,
     width: 70,
+    marginLeft: "auto",
   },
-  buttonTO: {
-    paddingVertical: 30,
-  },
+  // buttonTO: {
+  //   // paddingVertical: 30,
+  // },
   buttonText: {
-    height: 55,
-    width: "100%",
+    height: 45,
+    width: "auto",
     textAlign: "center",
     fontSize: 18,
     fontWeight: "bold",
     backgroundColor: "#fff",
-    paddingTop: "25%",
+    paddingTop: 10,
+    paddingBottom: 10,
     borderTopRightRadius: 15,
     borderBottomLeftRadius: 15,
   },
-  header: {
+  header2: {
     fontSize: 24,
     fontWeight: "bold",
     textAlign: "center",
-    marginBottom: 30,
-    marginTop: 10,
+    marginBottom: 20,
+    // marginTop: 10,
     color: "#fff",
   },
   loader: {
@@ -222,10 +230,7 @@ const styles = StyleSheet.create({
     flexShrink: 1,
     color: "#fff",
   },
-  h: {
-    display: "flex",
-    flexDirection: "row",
-  },
+
   heartIcon: {
     marginLeft: "auto",
   },
