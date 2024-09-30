@@ -67,12 +67,22 @@ export default function SignupScreen({ navigation }) {
   };
 
   const handleSubmit = () => {
+    // First, validate each field
     validateName(Name);
     validateEmail(email);
     validatePassword(password);
     validateConfirmPassword(confirmpassword);
 
-    if (!NameError && !emailError && !passwordError && !confirmpasswordError) {
+    if (
+      !NameError &&
+      !emailError &&
+      !passwordError &&
+      !confirmpasswordError &&
+      Name &&
+      email &&
+      password &&
+      confirmpassword
+    ) {
       alert("Sign up Successful!");
       const userData = { Name, email, profilePhoto };
       setUser(userData);
@@ -143,38 +153,41 @@ export default function SignupScreen({ navigation }) {
         <TouchableOpacity onPress={pickImage}>
           <View style={styles.profile}>
             {profilePhoto ? (
-            <Image
-              source={{ uri: profilePhoto }}
-              style={styles.profilePhoto}
-            />
-          ) : (
-            <Image
-              source={require("../t/ProfileLogo.png")}
-              style={styles.profilePhoto}
-            />
-          )}
+              <Image
+                source={{ uri: profilePhoto }}
+                style={styles.profilePhoto}
+              />
+            ) : (
+              <Image
+                source={require("../t/ProfileLogo.png")}
+                style={styles.profilePhoto}
+              />
+            )}
             <Text style={styles.textButton}> Upload Your Profile Photo</Text>
           </View>
         </TouchableOpacity>
+        
+        <View>
+          <TextInput
+            style={styles.input}
+            placeholder="Your Name"
+            onChangeText={validateName}
+          />
 
-        <TextInput
-          style={styles.input}
-          placeholder="Your Name"
-          onChangeText={validateName}
-        />
+          {NameError ? <Text style={styles.errorText}>{NameError}</Text> : null}
 
-        {NameError ? <Text style={styles.errorText}>{NameError}</Text> : null}
+          <TextInput
+            style={styles.input}
+            placeholder="Email-address"
+            keyboardType="email-address"
+            onChangeText={validateEmail}
+          />
 
-        <TextInput
-          style={styles.input}
-          placeholder="Email-address"
-          keyboardType="email-address"
-          onChangeText={validateEmail}
-        />
+          {emailError ? (
+            <Text style={styles.errorText}>{emailError}</Text>
+          ) : null}
 
-        {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
-
-        {/* <TextInput
+          {/* <TextInput
           style={styles.input}
           placeholder="Contact Number"
           keyboardType="number-pad"
@@ -182,34 +195,34 @@ export default function SignupScreen({ navigation }) {
             setNumber(text);
             setNumberError("");
           }}
-        />
+          />
 
-        {numberError ? (
-          <Text style={styles.errorText}>{numberError}</Text>
-        ) : null} */}
+          {numberError ? (
+            <Text style={styles.errorText}>{numberError}</Text>
+          ) : null} */}
 
-        <TextInput
-          style={styles.input}
-          placeholder="Set password"
-          secureTextEntry
-          onChangeText={validatePassword}
-        ></TextInput>
+          <TextInput
+            style={styles.input}
+            placeholder="Set password"
+            secureTextEntry
+            onChangeText={validatePassword}
+          ></TextInput>
 
-        {passwordError ? (
-          <Text style={styles.errorText}>{passwordError}</Text>
-        ) : null}
+          {passwordError ? (
+            <Text style={styles.errorText}>{passwordError}</Text>
+          ) : null}
 
-        <TextInput
-          style={styles.input}
-          placeholder="Confirm password"
-          secureTextEntry
-          onChangeText={validateConfirmPassword}
-        ></TextInput>
+          <TextInput
+            style={styles.input}
+            placeholder="Confirm password"
+            secureTextEntry
+            onChangeText={validateConfirmPassword}
+          ></TextInput>
 
-        {confirmpasswordError ? (
-          <Text style={styles.errorText}>{confirmpasswordError}</Text>
-        ) : null}
-
+          {confirmpasswordError ? (
+            <Text style={styles.errorText}>{confirmpasswordError}</Text>
+          ) : null}
+        </View>
         <View
           style={{
             display: "flex",
@@ -297,7 +310,7 @@ export default function SignupScreen({ navigation }) {
           <TouchableOpacity>
             <Text
               style={{
-                color: "#fff",
+                color: "red",
                 fontSize: 16,
                 fontWeight: "bold",
                 marginLeft: 3,
@@ -352,7 +365,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 30,
     marginTop: 23,
-    marginBottom: 10,
+    marginBottom: 12,
   },
   viewButton: {
     justifyContent: "center",
@@ -386,7 +399,7 @@ const styles = StyleSheet.create({
   textButton: {
     color: "#fff",
     fontSize: 18,
-    marginBottom: 10,
+    marginBottom: 23,
   },
   profilePhoto: {
     width: 100,
@@ -395,7 +408,7 @@ const styles = StyleSheet.create({
     borderWidth: 1.4,
     borderRadius: 100,
     marginVertical: 15,
-    alignSelf: "center"
+    alignSelf: "center",
   },
   profile: {
     alignSelf: "center",

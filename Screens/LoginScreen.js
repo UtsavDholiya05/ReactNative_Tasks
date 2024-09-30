@@ -17,29 +17,30 @@ export default function LoginScreen({ navigation }) {
   // Email validation regex
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-  const validateInputs = () => {
-    let valid = true;
-    setEmailError("");
-    setPasswordError("");
-
-    // Email validation
+  const validateEmail = (email) => {
+    setEmail(email);
     if (!emailRegex.test(email)) {
-      setEmailError("Please enter a valid email address.");
-      valid = false;
+      setEmailError("Please enter a valid email.");
+    } else {
+      setEmailError("");
     }
+  };
 
-    // Password validation
+  const validatePassword = (password) => {
+    setPassword(password);
     if (password.length < 6) {
       setPasswordError("Password must be at least 6 characters long.");
-      valid = false;
+    } else {
+      setPasswordError("");
     }
-
-    return valid;
   };
 
   const handleSubmit = () => {
-    if (validateInputs()) {
-      alert("Log in Successful!");
+    validateEmail(email);
+    validatePassword(password);
+    
+    if (emailError === "" && passwordError === "" && email && password) {
+      alert("Login Successful!");
       navigation.navigate("Home");
     }
   };
@@ -81,10 +82,7 @@ export default function LoginScreen({ navigation }) {
             style={styles.input}
             placeholder="Enter your Email address"
             keyboardType={"email-address"}
-            onChangeText={(text) => {
-              setEmail(text);
-              setEmailError("");
-            }}
+            onChangeText={validateEmail}
           />
         </View>
 
@@ -94,10 +92,7 @@ export default function LoginScreen({ navigation }) {
           style={styles.input}
           placeholder="Enter your password"
           secureTextEntry
-          onChangeText={(text) => {
-            setPassword(text);
-            setPasswordError("");
-          }}
+          onChangeText={validatePassword}
         ></TextInput>
 
         {passwordError ? (
@@ -149,7 +144,7 @@ export default function LoginScreen({ navigation }) {
           <TouchableOpacity>
             <Text
               style={{
-                color: "#fff",
+                color: "red",
                 fontSize: 16,
                 fontWeight: "bold",
                 marginLeft: 3,
