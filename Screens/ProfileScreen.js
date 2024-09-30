@@ -10,6 +10,8 @@ import {
 import React, { useContext } from "react";
 import { UserContext } from "../Context/Login";
 import * as ImagePicker from "expo-image-picker";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 export default function ProfileScreen() {
   const { user, setUser } = useContext(UserContext);

@@ -126,7 +126,6 @@ export default function HomeScreen({ navigation }) {
             data={movies}
             keyExtractor={(item) => item.id.toString()}
             renderItem={renderMovieItem}
-            contentContainerStyle={styles.list}
           />
         )}
       </ImageBackground>
@@ -207,9 +206,6 @@ const styles = StyleSheet.create({
   error: {
     fontSize: 18,
     color: "red",
-  },
-  list: {
-    paddingBottom: 20,
   },
   movieItem: {
     flexDirection: "row",

@@ -80,6 +80,26 @@ export default function SignupScreen({ navigation }) {
     }
   };
 
+  // const handleSubmit = async () => {
+  //   validateName(Name);
+  //   validateEmail(email);
+  //   validatePassword(password);
+  //   validateConfirmPassword(confirmpassword);
+
+  //   if (!NameError && !emailError && !passwordError && !confirmpasswordError) {
+  //     const userData = { Name, email, profilePhoto };
+  //     try {
+  //       await AsyncStorage.setItem("@user_data", JSON.stringify(userData));
+
+  //       alert("Sign up Successful!");
+  //       setUser(userData);
+  //       navigation.navigate("Home");
+  //     } catch (e) {
+  //       console.error("Failed to save user data.", e);
+  //     }
+  //   }
+  // };
+
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
