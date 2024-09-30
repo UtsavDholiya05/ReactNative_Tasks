@@ -75,7 +75,7 @@ export default function HomeScreen({ navigation }) {
         style={styles.backgroundImage}
         // resizeMode="repeat"
       >
-        <View style={styles.header}>
+        {/* <View style={styles.header}>
           <Text style={styles.text}>Welcome!</Text>
 
           {/* {user.profilePhoto ? (
@@ -85,7 +85,7 @@ export default function HomeScreen({ navigation }) {
             />
           ) : (
             <Text style={styles.textWelcome}>Welcome!</Text>
-          )} */}
+          )} 
 
           <View style={styles.ButtonView}>
             <TouchableOpacity>
@@ -108,7 +108,7 @@ export default function HomeScreen({ navigation }) {
               </Text>
             </TouchableOpacity>
           </View>
-        </View>
+        </View> */}
 
         <Text style={styles.header2}>Movie Recommendations</Text>
 
@@ -189,8 +189,8 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     textAlign: "center",
-    marginBottom: 20,
-    // marginTop: 10,
+    marginBottom: 15,
+    marginTop: 18,
     color: "#fff",
   },
   loader: {

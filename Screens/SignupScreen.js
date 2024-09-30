@@ -132,8 +132,8 @@ export default function SignupScreen({ navigation }) {
             color: "#D5F2E3",
             fontSize: 19,
             fontWeight: "bold",
-            marginBottom: 10,
-            // marginTop: 10,
+            marginBottom: 4,
+            marginTop: 4,
             alignSelf: "center",
           }}
         >
@@ -344,7 +344,7 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
     fontSize: 30,
-    marginTop: 20,
+    marginTop: 23,
     marginBottom: 10,
   },
   viewButton: {

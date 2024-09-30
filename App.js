@@ -11,7 +11,9 @@ import FavouriteScreen from "./Screens/FavouriteScreen";
 import { UserProvider } from "./Context/Login";
 import { FavoritesProvider } from "./Context/EditFavorite";
 import EditProfile from "./Screens/EditProfile";
+import Welcome from "./Screens/Welcome"
 // import Try from "./Screens/Try"
+
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -62,10 +64,11 @@ export default function App() {
     <UserProvider>
       <FavoritesProvider>
         <NavigationContainer>
-          <Stack.Navigator initialRouteName="Home">
+          <Stack.Navigator initialRouteName="Welcome">
             {/* <Stack.Screen name="Home" component={HomeScreen} /> */}
             <Stack.Screen name="Login" component={LoginScreen} />
             <Stack.Screen name="Sign Up" component={SignupScreen} />
+            <Stack.Screen name="Welcome" component={Welcome} />
             
             <Stack.Screen
               name="Home"
