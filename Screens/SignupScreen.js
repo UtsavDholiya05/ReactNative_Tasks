@@ -142,10 +142,17 @@ export default function SignupScreen({ navigation }) {
 
         <TouchableOpacity onPress={pickImage}>
           <View style={styles.profile}>
+            {profilePhoto ? (
+            <Image
+              source={{ uri: profilePhoto }}
+              style={styles.profilePhoto}
+            />
+          ) : (
             <Image
               source={require("../t/ProfileLogo.png")}
               style={styles.profilePhoto}
             />
+          )}
             <Text style={styles.textButton}> Upload Your Profile Photo</Text>
           </View>
         </TouchableOpacity>
@@ -384,9 +391,11 @@ const styles = StyleSheet.create({
   profilePhoto: {
     width: 100,
     height: 100,
-    borderRadius: 50,
+    borderColor: "white",
+    borderWidth: 1.4,
+    borderRadius: 100,
     marginVertical: 15,
-    alignSelf: "center",
+    alignSelf: "center"
   },
   profile: {
     alignSelf: "center",
