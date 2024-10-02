@@ -15,10 +15,7 @@ export default function WelcomeScreen({ navigation }) {
     >
       <View style={styles.container}>
         <Text style={styles.title}>Welcome!</Text>
-        {/* <Text style={styles.subtitle}> 
-          One App, Endless Recommendations. Offering tailored content just for
-          you!
-        </Text> */}
+       
         <TouchableOpacity
           style={styles.button}
           onPress={() => navigation.navigate("Login")}
