@@ -15,12 +15,12 @@ export default function WelcomeScreen({ navigation }) {
     >
       <View style={styles.container}>
         <Text style={styles.title}>Welcome!</Text>
-       
+
         <TouchableOpacity
           style={styles.button}
           onPress={() => navigation.navigate("Login")}
         >
-          <Text style={styles.buttonText}>Let's Get Started</Text>
+        <Text style={styles.buttonText}>Let's Get Started</Text>
         </TouchableOpacity>
       </View>
     </ImageBackground>
