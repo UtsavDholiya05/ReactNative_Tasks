@@ -166,7 +166,7 @@ export default function SignupScreen({ navigation }) {
             <Text style={styles.textButton}> Upload Your Profile Photo</Text>
           </View>
         </TouchableOpacity>
-        
+
         <View>
           <TextInput
             style={styles.input}
@@ -258,13 +258,15 @@ export default function SignupScreen({ navigation }) {
           style={{
             display: "flex",
             flexDirection: "row",
-            paddingRight: 16,
-            width: "100%",
+            // paddingRight: 16,
+            // width: "100%",
             marginBottom: 20,
-            marginHorizontal: 30,
+            marginHorizontal: 27,
           }}
         >
-          <Text style={{ color: "#fff", fontSize: 14 }}>and </Text>
+          <Text style={{ color: "#fff", fontSize: 14, fontWeight: "bold" }}>
+            and{" "}
+          </Text>
           <Text style={{ color: "red", fontSize: 14, fontWeight: "bold" }}>
             Privacy Policy
           </Text>

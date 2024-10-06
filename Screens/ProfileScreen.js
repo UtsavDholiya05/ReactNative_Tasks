@@ -10,8 +10,7 @@ import {
 import React, { useContext } from "react";
 import { UserContext } from "../Context/Login";
 import * as ImagePicker from "expo-image-picker";
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function ProfileScreen() {
   const { user, setUser } = useContext(UserContext);
@@ -62,9 +61,16 @@ export default function ProfileScreen() {
             />
           )}
         </View>
-        <Text style={styles.input}>Name: {user.Name}</Text>
 
-        <Text style={styles.input}>Email: {user.email}</Text>
+        <View style={styles.input}>
+          <Text style={{ color: "black" , fontWeight:"bold" }}>Name: </Text>
+          <Text>{user.Name}</Text>
+        </View>
+
+        <View style={styles.input}>
+          <Text style={{ color: "black" , fontWeight:"bold" }}>Email: </Text>
+          <Text>{user.email}</Text>
+        </View>
 
         {/* <Button title="Change Profile Picture" onPress={pickImage} /> */}
         <View>
@@ -89,13 +95,15 @@ const styles = StyleSheet.create({
     height: 50,
     width: "90%",
     alignSelf: "center",
-    alignContent: "center",
-    justifyContent: "center",
+    // alignContent: "center",
+    // justifyContent: "center",
     backgroundColor: "#fff",
     paddingVertical: 15,
     paddingLeft: 9,
     marginVertical: 20,
-    borderRadius: 100,
+    borderRadius: 15,
+    display: "flex",
+    flexDirection: "row",
   },
   backgroundImage: {
     height: "100%",
