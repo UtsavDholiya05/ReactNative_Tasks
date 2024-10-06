@@ -12,6 +12,7 @@ import {
 import { useContext, useState } from "react";
 import { UserContext } from "../Context/Login";
 import * as ImagePicker from "expo-image-picker";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function SignupScreen({ navigation }) {
   const [email, setEmail] = useState("");
@@ -66,8 +67,7 @@ export default function SignupScreen({ navigation }) {
     }
   };
 
-  const handleSubmit = () => {
-    // First, validate each field
+  const handleSubmit = async () => {
     validateName(Name);
     validateEmail(email);
     validatePassword(password);
@@ -83,10 +83,21 @@ export default function SignupScreen({ navigation }) {
       password &&
       confirmpassword
     ) {
-      alert("Sign up Successful!");
       const userData = { Name, email, profilePhoto };
-      setUser(userData);
-      navigation.navigate("Home");
+      
+      try {
+        // Save user data to AsyncStorage
+        await AsyncStorage.setItem("@user_data", JSON.stringify(userData));
+        
+        // Update context with the new user data
+        setUser(userData);
+
+        alert("Sign up Successful!");
+        navigation.navigate("Home");
+      } 
+       catch (e) {
+        console.error("Failed to save user data.", e);
+       }
     }
   };
 

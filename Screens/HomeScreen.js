@@ -75,17 +75,8 @@ export default function HomeScreen({ navigation }) {
         style={styles.backgroundImage}
         // resizeMode="repeat"
       >
-        {/* <View style={styles.header}>
+        <View style={styles.header}>
           <Text style={styles.text}>Welcome!</Text>
-
-          {/* {user.profilePhoto ? (
-            <Image
-              source={{ uri: user.profilePhoto }}
-              style={styles.profilePhoto}
-            />
-          ) : (
-            <Text style={styles.textWelcome}>Welcome!</Text>
-          )} 
 
           <View style={styles.ButtonView}>
             <TouchableOpacity>
@@ -108,7 +99,7 @@ export default function HomeScreen({ navigation }) {
               </Text>
             </TouchableOpacity>
           </View>
-        </View> */}
+        </View> 
 
         <Text style={styles.header2}>Movie Recommendations</Text>
 

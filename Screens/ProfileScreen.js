@@ -7,13 +7,30 @@ import {
   Text,
   TouchableOpacity,
 } from "react-native";
-import React, { useContext } from "react";
+import React, { useContext ,useEffect} from "react";
 import { UserContext } from "../Context/Login";
 import * as ImagePicker from "expo-image-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function ProfileScreen() {
   const { user, setUser } = useContext(UserContext);
+
+
+  useEffect(() => {
+    const retrieveUserData = async () => {
+      try {
+        const savedUserData = await AsyncStorage.getItem("@user_data");
+        if (savedUserData !== null) {
+          const parsedUserData = JSON.parse(savedUserData);
+          setUser(parsedUserData); // Update user context with retrieved data
+        }
+      } catch (error) {
+        console.log("Error retrieving user data:", error);
+      }
+    };
+
+    retrieveUserData();
+  }, []); 
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
