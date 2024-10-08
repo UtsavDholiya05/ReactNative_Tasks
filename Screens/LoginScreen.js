@@ -5,14 +5,18 @@ import {
   View,
   TouchableOpacity,
   ImageBackground,
+  ActivityIndicator,
 } from "react-native";
 import { useState } from "react";
+import Icon from "react-native-vector-icons/FontAwesome";
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   // Email validation regex
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -35,14 +39,23 @@ export default function LoginScreen({ navigation }) {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     validateEmail(email);
     validatePassword(password);
-    
+
     if (emailError === "" && passwordError === "" && email && password) {
-      alert("Login Successful!");
-      navigation.navigate("Home");
+      setLoading(true); //  loading true when login process
+
+      setTimeout(() => {
+        alert("Login Successful!");
+        setLoading(false);
+        navigation.navigate("Home");
+      }, 1000);
     }
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   };
 
   return (
@@ -88,12 +101,20 @@ export default function LoginScreen({ navigation }) {
 
         {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
 
-        <TextInput
-          style={styles.input}
-          placeholder="Enter your password"
-          secureTextEntry
-          onChangeText={validatePassword}
-        ></TextInput>
+        <View style={styles.inputContainer}>
+          <TextInput
+            // style={styles.input}
+            placeholder="Enter your password"
+            secureTextEntry={!showPassword}
+            onChangeText={validatePassword}
+          />
+          <TouchableOpacity onPress={togglePasswordVisibility}>
+            <Icon
+              name={showPassword ? "eye" : "eye-slash"}
+              style={styles.iconStyle}
+            />
+          </TouchableOpacity>
+        </View>
 
         {passwordError ? (
           <Text style={styles.errorText}>{passwordError}</Text>
@@ -115,11 +136,15 @@ export default function LoginScreen({ navigation }) {
           <TouchableOpacity
             style={[styles.buttonTO]}
             onPress={handleSubmit}
-            disabled={!email || !password || emailError || passwordError}
+            disabled={
+              !email || !password || emailError || passwordError || loading
+            }
           >
-            {/* emailempty,passwordempty,any email error,any passwword errod */}
-
-            <Text style={styles.buttonText}>Login</Text>
+            {loading ? (
+              <ActivityIndicator size="small" color="#fff" />
+            ) : (
+              <Text style={styles.buttonText}>Login</Text>
+            )}
           </TouchableOpacity>
         </View>
 
@@ -138,7 +163,7 @@ export default function LoginScreen({ navigation }) {
               marginVertical: 20,
             }}
           >
-            Dont't have an account?
+            Don't have an account?
           </Text>
 
           <TouchableOpacity>
@@ -227,5 +252,22 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 20,
     textAlign: "center",
+  },
+  inputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    height: 45,
+    width: "90%",
+    alignSelf: "center",
+    backgroundColor: "#fff",
+    marginBottom: 15,
+    paddingHorizontal: 10,
+    marginVertical: 10,
+    borderRadius: 100,
+  },
+  iconStyle: {
+    fontSize: 24,
+    color: "black",
+    marginLeft: 160,
   },
 });

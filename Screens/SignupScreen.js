@@ -8,11 +8,13 @@ import {
   Alert,
   ScrollView,
   Image,
+  ActivityIndicator
 } from "react-native";
 import { useContext, useState } from "react";
 import { UserContext } from "../Context/Login";
 import * as ImagePicker from "expo-image-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Icon from "react-native-vector-icons/FontAwesome";
 
 export default function SignupScreen({ navigation }) {
   const [email, setEmail] = useState("");
@@ -21,11 +23,13 @@ export default function SignupScreen({ navigation }) {
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [confirmpasswordError, setConfirmPasswordError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [Name, setName] = useState("");
   const [NameError, setNameError] = useState("");
   // const [number, setNumber] = useState("");
   // const [numberError, setNumberError] = useState("");
   const [profilePhoto, setprofilePhoto] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   // Email validation regex
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -33,8 +37,8 @@ export default function SignupScreen({ navigation }) {
 
   const validateName = (name) => {
     setName(name);
-    if (name.length < 3) {
-      setNameError("Name must be at least 3 characters long.");
+    if (name.length < 2) {
+      setNameError("Name must be at least 2 characters long.");
     } else {
       setNameError("");
     }
@@ -73,6 +77,7 @@ export default function SignupScreen({ navigation }) {
     validatePassword(password);
     validateConfirmPassword(confirmpassword);
 
+    setLoading(true);
     if (
       !NameError &&
       !emailError &&
@@ -84,42 +89,26 @@ export default function SignupScreen({ navigation }) {
       confirmpassword
     ) {
       const userData = { Name, email, profilePhoto };
-      
+
       try {
         // Save user data to AsyncStorage
-        await AsyncStorage.setItem("@user_data", JSON.stringify(userData));
-        
+        await AsyncStorage.setItem("@user_daxta", JSON.stringify(userData));
+
         // Update context with the new user data
         setUser(userData);
-
-        alert("Sign up Successful!");
-        navigation.navigate("Home");
+        setTimeout(() => {
+          alert("Sign up Successful!");
+          setLoading(false);
+          navigation.navigate("Home");
+        }, 1000);
       } 
-       catch (e) {
+      catch (e) 
+      {
         console.error("Failed to save user data.", e);
-       }
+      }
     }
   };
 
-  // const handleSubmit = async () => {
-  //   validateName(Name);
-  //   validateEmail(email);
-  //   validatePassword(password);
-  //   validateConfirmPassword(confirmpassword);
-
-  //   if (!NameError && !emailError && !passwordError && !confirmpasswordError) {
-  //     const userData = { Name, email, profilePhoto };
-  //     try {
-  //       await AsyncStorage.setItem("@user_data", JSON.stringify(userData));
-
-  //       alert("Sign up Successful!");
-  //       setUser(userData);
-  //       navigation.navigate("Home");
-  //     } catch (e) {
-  //       console.error("Failed to save user data.", e);
-  //     }
-  //   }
-  // };
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -138,6 +127,10 @@ export default function SignupScreen({ navigation }) {
         [{ text: "OK" }]
       );
     }
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   };
 
   return (
@@ -212,12 +205,20 @@ export default function SignupScreen({ navigation }) {
             <Text style={styles.errorText}>{numberError}</Text>
           ) : null} */}
 
-          <TextInput
-            style={styles.input}
-            placeholder="Set password"
-            secureTextEntry
-            onChangeText={validatePassword}
-          ></TextInput>
+          <View style={styles.inputContainer}>
+            <TextInput
+              // style={styles.input}
+              placeholder="Set password"
+              secureTextEntry={!showPassword}
+              onChangeText={validatePassword}
+            ></TextInput>
+            <TouchableOpacity onPress={togglePasswordVisibility}>
+              <Icon
+                name={showPassword ? "eye" : "eye-slash"}
+                style={styles.iconStyle}
+              />
+            </TouchableOpacity>
+          </View>
 
           {passwordError ? (
             <Text style={styles.errorText}>{passwordError}</Text>
@@ -298,7 +299,11 @@ export default function SignupScreen({ navigation }) {
               NameError
             }
           >
-            <Text style={styles.buttonText}>Sign up</Text>
+            {loading ? (
+              <ActivityIndicator size="small" color="#fff" />
+            ) : (
+              <Text style={styles.buttonText}>Sign up</Text>
+            )}
           </TouchableOpacity>
         </View>
 
@@ -365,7 +370,7 @@ const styles = StyleSheet.create({
     height: 45,
     width: "90%",
     alignSelf: "center",
-    borderColor: "#ddd",
+    // borderColor: "#ddd",
     backgroundColor: "#fff",
     marginBottom: 15,
     paddingHorizontal: 10,
@@ -425,5 +430,23 @@ const styles = StyleSheet.create({
   },
   profile: {
     alignSelf: "center",
+  },
+  iconStyle: {
+    fontSize: 24,
+    color: "black",
+    marginLeft: 200,
+  },
+  inputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    height: 45,
+    width: "90%",
+    alignSelf: "center",
+    // borderColor: "#ddd",
+    backgroundColor: "#fff",
+    marginBottom: 15,
+    paddingHorizontal: 10,
+    marginVertical: 10,
+    borderRadius: 100,
   },
 });

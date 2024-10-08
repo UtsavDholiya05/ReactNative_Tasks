@@ -12,7 +12,7 @@ import { UserProvider } from "./Context/Login";
 import { FavoritesProvider } from "./Context/EditFavorite";
 import EditProfile from "./Screens/EditProfile";
 import Welcome from "./Screens/Welcome"
-// import Try from "./Screens/Try"
+import Try from "./Screens/Try"
 
 
 const Stack = createNativeStackNavigator();

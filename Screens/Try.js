@@ -1,171 +1,347 @@
-import React, { useEffect, useState, useContext } from "react";
 import {
-  View,
-  Text,
   StyleSheet,
-  TouchableOpacity,
+  Text,
+  TextInput,
+  View,
   ImageBackground,
-  FlatList,
+  TouchableOpacity,
+  Alert,
+  ScrollView,
   Image,
-  ActivityIndicator,
-  Dimensions, // Import Dimensions for calculating width
 } from "react-native";
-import axios from "axios";
-import Icon from "react-native-vector-icons/Ionicons";
-import { FavoritesContext } from "../Context/EditFavorite";
+import { useContext, useState } from "react";
 import { UserContext } from "../Context/Login";
+import * as ImagePicker from "expo-image-picker";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import Icon from "react-native-vector-icons/FontAwesome";
 
-const API_KEY = "4e5572039c914d1e01b8204518c64978";
-const API_URL = `https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}&language=en-US&page=1`;
+export default function SignupScreen({ navigation }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmpassword, setConfirmPassword] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [confirmpasswordError, setConfirmPasswordError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [Name, setName] = useState("");
+  const [NameError, setNameError] = useState("");
+  const [profilePhoto, setprofilePhoto] = useState(null);
 
-export default function HomeScreen({ navigation }) {
-  const [movies, setMovies] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const { user, setUser } = useContext(UserContext);
 
-  const { addToFavorites, removeFromFavorites, isFavorite } =
-    useContext(FavoritesContext);
-
-  const windowWidth = Dimensions.get("window").width; // Get the screen width
-  const itemWidth = (windowWidth - 40) / 2; // Calculate width for each movie item with padding
-
-  useEffect(() => {
-    fetchMovies();
-  }, []);
-
-  const fetchMovies = async () => {
-    setLoading(true);
-    try {
-      const response = await axios.get(API_URL);
-      setMovies(response.data.results);
-    } catch (err) {
-      setError("Failed to fetch movies.");
-    } finally {
-      setLoading(false);
+  const validateName = (name) => {
+    setName(name);
+    if (name.length < 3) {
+      setNameError("Name must be at least 3 characters long.");
+    } else {
+      setNameError("");
     }
   };
 
-  const renderMovieItem = ({ item }) => {
-    const favorite = isFavorite(item.id);
-    return (
-      <View style={[styles.movieItem, { width: itemWidth }]}>
-        <Image
-          source={{
-            uri: `https://image.tmdb.org/t/p/w500${item.poster_path}`,
-          }}
-          style={styles.poster}
-        />
-        <View style={styles.titleContainer}>
-          <Text style={styles.movieTitle}>{item.title}</Text>
-          <Icon
-            name={favorite ? "heart" : "heart-outline"}
-            size={25}
-            color={favorite ? "red" : "white"}
-            style={styles.icon}
-            onPress={() =>
-              favorite ? removeFromFavorites(item.id) : addToFavorites(item)
-            }
-          />
-        </View>
-      </View>
-    );
+  const validateEmail = (email) => {
+    setEmail(email);
+    if (!emailRegex.test(email)) {
+      setEmailError("Please enter a valid email.");
+    } else {
+      setEmailError("");
+    }
+  };
+
+  const validatePassword = (password) => {
+    setPassword(password);
+    if (password.length < 6) {
+      setPasswordError("Password must be at least 6 characters long.");
+    } else {
+      setPasswordError("");
+    }
+  };
+
+  const validateConfirmPassword = (confirmPassword) => {
+    setConfirmPassword(confirmPassword);
+    if (confirmPassword !== password) {
+      setConfirmPasswordError("Passwords do not match.");
+    } else {
+      setConfirmPasswordError("");
+    }
+  };
+
+  const handleSubmit = async () => {
+    validateName(Name);
+    validateEmail(email);
+    validatePassword(password);
+    validateConfirmPassword(confirmpassword);
+
+    if (
+      !NameError &&
+      !emailError &&
+      !passwordError &&
+      !confirmpasswordError &&
+      Name &&
+      email &&
+      password &&
+      confirmpassword
+    ) {
+      const userData = { Name, email, profilePhoto };
+
+      try {
+        await AsyncStorage.setItem("@user_data", JSON.stringify(userData));
+        setUser(userData);
+        alert("Sign up Successful!");
+        navigation.navigate("Home");
+      } catch (e) {
+        console.error("Failed to save user data.", e);
+      }
+    }
+  };
+
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setprofilePhoto(result.assets[0].uri);
+      Alert.alert(
+        "Photo Uploaded",
+        "Your profile picture has been successfully uploaded!",
+        [{ text: "OK" }]
+      );
+    }
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       <ImageBackground
         source={require("../t/WhatsApp Image 2024-09-28 at 21.29.25_158d91f3.jpg")}
         style={styles.backgroundImage}
       >
-        <Text style={styles.header2}>Movie Recommendations</Text>
+        <Text style={styles.title}>Sign Up</Text>
+        <Text style={styles.subtitle}>Create a new account</Text>
 
-        {/* Loader and error handling */}
-        {loading ? (
-          <View style={styles.loader}>
-            <ActivityIndicator size="large" color="#0000ff" />
+        <TouchableOpacity onPress={pickImage}>
+          <View style={styles.profile}>
+            {profilePhoto ? (
+              <Image
+                source={{ uri: profilePhoto }}
+                style={styles.profilePhoto}
+              />
+            ) : (
+              <Image
+                source={require("../t/ProfileLogo.png")}
+                style={styles.profilePhoto}
+              />
+            )}
+            <Text style={styles.textButton}>Upload Your Profile Photo</Text>
           </View>
-        ) : error ? (
-          <View style={styles.center}>
-            <Text style={styles.error}>{error}</Text>
-          </View>
-        ) : (
-          <FlatList
-            data={movies}
-            keyExtractor={(item) => item.id.toString()}
-            numColumns={2} 
-            columnWrapperStyle={styles.columnWrapper}
-            renderItem={renderMovieItem}
+        </TouchableOpacity>
+
+        <View style={styles.form}>
+          <TextInput
+            style={styles.input}
+            placeholder="Your Name"
+            onChangeText={validateName}
           />
-        )}
+          {NameError ? <Text style={styles.errorText}>{NameError}</Text> : null}
+
+          <TextInput
+            style={styles.input}
+            placeholder="Email-address"
+            keyboardType="email-address"
+            onChangeText={validateEmail}
+          />
+          {emailError ? (
+            <Text style={styles.errorText}>{emailError}</Text>
+          ) : null}
+
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input1}
+              placeholder="Set password"
+              secureTextEntry={!showPassword}
+              onChangeText={validatePassword}
+            />
+            <TouchableOpacity onPress={togglePasswordVisibility}>
+              <Icon
+                name={showPassword ? "eye-slash" : "eye"}
+                style={styles.iconStyle}
+              />
+            </TouchableOpacity>
+            {passwordError ? (
+              <Text style={styles.errorText}>{passwordError}</Text>
+            ) : null}
+          </View>
+
+          <TextInput
+            style={styles.input}
+            placeholder="Confirm password"
+            secureTextEntry
+            onChangeText={validateConfirmPassword}
+          />
+          {confirmpasswordError ? (
+            <Text style={styles.errorText}>{confirmpasswordError}</Text>
+          ) : null}
+        </View>
+
+        <View style={styles.termsContainer}>
+          <Text style={styles.termsText}>By signing in, you agree to our </Text>
+          <Text style={styles.termsLink}>Terms & Conditions</Text>
+        </View>
+
+        <View style={styles.termsContainer}>
+          <Text style={styles.termsText}>and </Text>
+          <Text style={styles.termsLink}>Privacy Policy</Text>
+        </View>
+
+        <TouchableOpacity
+          style={styles.buttonTO}
+          onPress={handleSubmit}
+          disabled={
+            !email ||
+            !password ||
+            !confirmpassword ||
+            !Name ||
+            emailError ||
+            passwordError ||
+            confirmpasswordError ||
+            NameError
+          }
+        >
+          <Text style={styles.buttonText}>Sign up</Text>
+        </TouchableOpacity>
+
+        <View style={styles.loginPrompt}>
+          <Text style={styles.promptText}>Already have an account?</Text>
+          <TouchableOpacity onPress={() => navigation.navigate("Login")}>
+            <Text style={styles.loginLink}> Login</Text>
+          </TouchableOpacity>
+        </View>
       </ImageBackground>
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
+    justifyContent: "center",
   },
   backgroundImage: {
-    height: "100%",
-    width: "100%",
+    flex: 1,
     justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
   },
-  columnWrapper: {
-    justifyContent: "space-between",
-    paddingHorizontal: 10, // Add padding to avoid items touching the screen edge
-  },
-  header2: {
-    fontSize: 24,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 20,
+  title: {
+    alignSelf: "center",
     color: "#fff",
+    fontWeight: "bold",
+    fontSize: 32,
+    marginTop: 20,
+    marginBottom: 10,
   },
-  loader: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  center: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  error: {
+  subtitle: {
+    color: "#D5F2E3",
     fontSize: 18,
-    color: "red",
+    fontWeight: "600",
+    marginBottom: 20,
+    alignSelf: "center",
   },
-  poster: {
-    width: "100%", // Make poster fill the width of its container
-    height: 150,
-    borderRadius: 8,
+  profile: {
+    alignSelf: "center",
+    marginBottom: 20,
   },
-  movieItem: {
-    marginBottom: 15,
-    borderRadius: 8,
-    borderWidth: 1,
+  profilePhoto: {
+    width: 100,
+    height: 100,
     borderColor: "white",
-    borderStyle: "solid",
-    elevation: 3,
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    padding: 10,
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.6)", // Add background color for better visibility
+    borderWidth: 1.4,
+    borderRadius: 50,
+    marginBottom: 10,
   },
-  titleContainer: {
+  textButton: {
+    color: "#fff",
+    fontSize: 16,
+  },
+  form: {
+    width: "100%",
+    borderRadius: 10,
+    padding: 20,
+
+  },
+  input: {
+    height: 50,
+    width: "100%",
+    backgroundColor: "#f2f2f2",
+    color: "#333",
+    marginBottom: 15,
+    borderRadius: 10,
+    paddingHorizontal: 15,
+  },
+  inputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
-    marginTop: 10,
+    marginBottom: 15,
+    borderColor:"white",
+    borderWidth:1,
+    
   },
-  movieTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
+  iconStyle: {
+    fontSize: 24,
+    color: "#333",
+    padding: 10,
+  },
+  buttonTO: {
+    backgroundColor: "#3498db",
+    paddingVertical: 12,
+    borderRadius: 10,
+    width: "100%",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  buttonText: {
     color: "#fff",
-    flexShrink: 1,
+    fontSize: 18,
   },
+  errorText: {
+    color: "red",
+    marginBottom: 10,
+    fontSize: 14,
+  },
+  termsContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginBottom: 10,
+  },
+  termsText: {
+    color: "#666",
+  },
+  termsLink: {
+    color: "#3498db",
+    fontWeight: "bold",
+  },
+  loginPrompt: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginTop: 20,
+  },
+  promptText: {
+    color: "#666",
+  },
+  loginLink: {
+    color: "#3498db",
+    fontWeight: "bold",
+  },
+  input1:{
+    backgroundColor: "#f2f2f2",
+   
+    color:"white",
+  }
 });
-
