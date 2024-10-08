@@ -7,7 +7,7 @@ import {
   Text,
   TouchableOpacity,
 } from "react-native";
-import React, { useContext ,useEffect} from "react";
+import React, { useContext ,useEffect} from "\react";
 import { UserContext } from "../Context/Login";
 import * as ImagePicker from "expo-image-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
