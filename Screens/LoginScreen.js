@@ -44,7 +44,7 @@ export default function LoginScreen({ navigation }) {
     validatePassword(password);
 
     if (emailError === "" && passwordError === "" && email && password) {
-      setLoading(true); //  loading true when login process
+      setLoading(true); // loading true when login process
 
       setTimeout(() => {
         alert("Login Successful!");
@@ -74,7 +74,6 @@ export default function LoginScreen({ navigation }) {
             marginTop: 50,
           }}
         >
-          {" "}
           Welcome Back
         </Text>
 
@@ -103,12 +102,12 @@ export default function LoginScreen({ navigation }) {
 
         <View style={styles.inputContainer}>
           <TextInput
-            // style={styles.input}
+            style={styles.input1}
             placeholder="Enter your password"
             secureTextEntry={!showPassword}
             onChangeText={validatePassword}
           />
-          <TouchableOpacity onPress={togglePasswordVisibility}>
+          <TouchableOpacity onPress={togglePasswordVisibility} style={styles.touch}>
             <Icon
               name={showPassword ? "eye" : "eye-slash"}
               style={styles.iconStyle}
@@ -128,7 +127,7 @@ export default function LoginScreen({ navigation }) {
           }}
         >
           <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 16 }}>
-            Forgot Password ?
+            Forgot Password?
           </Text>
         </View>
 
@@ -177,7 +176,6 @@ export default function LoginScreen({ navigation }) {
               }}
               onPress={() => navigation.navigate("Sign Up")}
             >
-              {" "}
               Signup
             </Text>
           </TouchableOpacity>
@@ -194,24 +192,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     justifyContent: "center",
   },
-  form: {
-    backgroundColor: "white",
-    padding: 20,
-    borderRadius: 10,
-    shadowColor: "black",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  label: {
-    fontSize: 16,
-    marginBottom: 5,
-    fontWeight: "bold",
-  },
   input: {
     height: 50,
     width: "90%",
@@ -223,12 +203,6 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     borderRadius: 100,
   },
-  image: {
-    width: 200,
-    height: 200,
-    alignSelf: "center",
-    marginBottom: 50,
-  },
   errorText: {
     color: "red",
     marginBottom: 10,
@@ -236,9 +210,25 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     marginLeft: 17,
   },
-  viewButton: {
-    justifyContent: "center",
+  inputContainer: {
+    flexDirection: "row",
     alignItems: "center",
+    height: 45,
+    width: "90%",
+    alignSelf: "center",
+    backgroundColor: "#fff",
+    marginBottom: 15,
+    paddingHorizontal: 10,
+    marginVertical: 10,
+    borderRadius: 100,
+    justifyContent: "space-between", // Ensure space between input and icon
+  },
+  input1: {
+    flex: 1,  // Take up most of the width
+  },
+  iconStyle: {
+    fontSize: 24,
+    color: "black",
   },
   buttonTO: {
     backgroundColor: "#3498db",
@@ -252,22 +242,5 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 20,
     textAlign: "center",
-  },
-  inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    height: 45,
-    width: "90%",
-    alignSelf: "center",
-    backgroundColor: "#fff",
-    marginBottom: 15,
-    paddingHorizontal: 10,
-    marginVertical: 10,
-    borderRadius: 100,
-  },
-  iconStyle: {
-    fontSize: 24,
-    color: "black",
-    marginLeft: 160,
   },
 });

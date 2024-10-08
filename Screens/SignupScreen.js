@@ -442,11 +442,14 @@ const styles = StyleSheet.create({
     height: 45,
     width: "90%",
     alignSelf: "center",
-    // borderColor: "#ddd",
     backgroundColor: "#fff",
     marginBottom: 15,
     paddingHorizontal: 10,
     marginVertical: 10,
     borderRadius: 100,
+    justifyContent: "space-between", // Ensure space between input and icon
+  },
+  input1: {
+    flex: 1,  // Take up most of the width
   },
 });
