@@ -8,7 +8,7 @@ import {
   Alert,
   ScrollView,
   Image,
-  ActivityIndicator
+  ActivityIndicator,
 } from "react-native";
 import { useContext, useState } from "react";
 import { UserContext } from "../Context/Login";
@@ -101,14 +101,11 @@ export default function SignupScreen({ navigation }) {
           setLoading(false);
           navigation.navigate("Home");
         }, 1000);
-      } 
-      catch (e) 
-      {
+      } catch (e) {
         console.error("Failed to save user data.", e);
       }
     }
   };
-
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -134,7 +131,7 @@ export default function SignupScreen({ navigation }) {
   };
 
   return (
-    <ScrollView>
+    <ScrollView keyboardShouldPersistTaps="handled">
       <ImageBackground
         source={require("../t/WhatsApp Image 2024-09-28 at 21.29.25_158d91f3.jpg")}
         style={{ height: "100%", width: "100%" }}
@@ -207,11 +204,11 @@ export default function SignupScreen({ navigation }) {
 
           <View style={styles.inputContainer}>
             <TextInput
-              // style={styles.input}
+              style={styles.input1}
               placeholder="Set password"
               secureTextEntry={!showPassword}
               onChangeText={validatePassword}
-            ></TextInput>
+            />
             <TouchableOpacity onPress={togglePasswordVisibility}>
               <Icon
                 name={showPassword ? "eye" : "eye-slash"}
@@ -432,9 +429,8 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
   iconStyle: {
-    fontSize: 24,
+    fontSize: 22,
     color: "black",
-    marginLeft: 200,
   },
   inputContainer: {
     flexDirection: "row",
@@ -447,9 +443,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginVertical: 10,
     borderRadius: 100,
-    justifyContent: "space-between", // Ensure space between input and icon
+    justifyContent: "space-between",
   },
   input1: {
-    flex: 1,  // Take up most of the width
+    flex: 1,
   },
 });

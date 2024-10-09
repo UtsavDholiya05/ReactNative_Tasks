@@ -7,14 +7,13 @@ import {
   Text,
   TouchableOpacity,
 } from "react-native";
-import React, { useContext ,useEffect} from "\react";
+import React, { useContext, useEffect } from "react";
 import { UserContext } from "../Context/Login";
 import * as ImagePicker from "expo-image-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function ProfileScreen() {
   const { user, setUser } = useContext(UserContext);
-
 
   useEffect(() => {
     const retrieveUserData = async () => {
@@ -30,7 +29,7 @@ export default function ProfileScreen() {
     };
 
     retrieveUserData();
-  }, []); 
+  }, []);
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -80,12 +79,12 @@ export default function ProfileScreen() {
         </View>
 
         <View style={styles.input}>
-          <Text style={{ color: "black" , fontWeight:"bold" }}>Name: </Text>
+          <Text style={{ color: "black", fontWeight: "bold" }}>Name: </Text>
           <Text>{user.Name}</Text>
         </View>
 
         <View style={styles.input}>
-          <Text style={{ color: "black" , fontWeight:"bold" }}>Email: </Text>
+          <Text style={{ color: "black", fontWeight: "bold" }}>Email: </Text>
           <Text>{user.email}</Text>
         </View>
 

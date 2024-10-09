@@ -7,7 +7,7 @@ import {
   ImageBackground,
   ActivityIndicator,
 } from "react-native";
-import { useState } from "react";
+import {useState} from "react";
 import Icon from "react-native-vector-icons/FontAwesome";
 
 export default function LoginScreen({ navigation }) {
@@ -227,7 +227,7 @@ const styles = StyleSheet.create({
     flex: 1,  // Take up most of the width
   },
   iconStyle: {
-    fontSize: 24,
+    fontSize: 22,
     color: "black",
   },
   buttonTO: {
