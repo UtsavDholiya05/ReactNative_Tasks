@@ -32,9 +32,9 @@ function Tabs() {
           } else if (route.name === "Profile") {
             iconName = focused ? "person" : "person-outline";
           }
-          // else if (route.name === "try") {
-          //   iconName = focused ? "person" : "person-outline";
-          // }
+          else if (route.name === "try") {
+            iconName = focused ? "person" : "person-outline";
+          }
 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
@@ -43,7 +43,7 @@ function Tabs() {
       <Tab.Screen name="Popular Movies" component={HomeScreen} />
       <Tab.Screen name="Favourite" component={FavouriteScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
-      {/* <Tab.Screen name="try" component={Try} /> */}
+      <Tab.Screen name="try" component={Try} />
     </Tab.Navigator>
   );
 }

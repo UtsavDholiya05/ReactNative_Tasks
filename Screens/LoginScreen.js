@@ -3,6 +3,7 @@ import {
   Text,
   TextInput,
   View,
+  KeyboardAvoidingView,
   TouchableOpacity,
   ImageBackground,
   ActivityIndicator,
@@ -59,7 +60,7 @@ export default function LoginScreen({ navigation }) {
   };
 
   return (
-    <View>
+    <KeyboardAvoidingView>
       <ImageBackground
         source={require("../t/WhatsApp Image 2024-09-28 at 21.29.25_158d91f3.jpg")}
         style={{ height: "100%", width: "100%" }}
@@ -181,7 +182,7 @@ export default function LoginScreen({ navigation }) {
           </TouchableOpacity>
         </View>
       </ImageBackground>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
