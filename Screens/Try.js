@@ -1,17 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   StyleSheet,
   Text,
-  Button,
   FlatList,
   TextInput,
   TouchableOpacity,
   ActivityIndicator,
 } from "react-native";
-import { useState } from "react";
 import * as Speech from "expo-speech";
 import axios from "axios";
+import ChatBubble from "./ChatBubble";
 
 const ChatBot = () => {
   const [chat, setChat] = useState([]);
@@ -20,10 +19,12 @@ const ChatBot = () => {
   const [error, setError] = useState(null);
   const [isSpeaking, setIsSpeaking] = useState(false);
 
-  const API_KEY = "AIzaSyAdudW--AGSvnD59Uo6YNRvKIDL5Qj-Tq0";
+  // Replace this with your actual API Key
+  const API_KEY = "AIzaSyDJ_H0p_9H9mVSj_KBK9qRbrstdhCxiZv8";
 
   const handleUserInput = async () => {
-    if (!userInput.trim()) return; 
+    if (!userInput.trim()) return;
+  
     let updatedChat = [
       ...chat,
       {
@@ -31,22 +32,21 @@ const ChatBot = () => {
         parts: [{ text: userInput }],
       },
     ];
-    setChat(updatedChat); 
+    setChat(updatedChat);
     setLoading(true);
-
+  
     try {
       const response = await axios.post(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key==${API_KEY}`,
         {
-          prompt: { contents: [{ text: userInput }] }, 
+          prompt: {
+            text: userInput, // This field should contain just the text
+          },
         }
       );
-
-      console.log("Gemini Pro API Response:", response.data);
-
-
-      const modelResponse = response.data?.candidates?.[0]?.text || "";
-
+  
+      const modelResponse = response.data?.candidates?.[0]?.output || "";
+  
       if (modelResponse) {
         const updatedChatWithModel = [
           ...updatedChat,
@@ -55,17 +55,17 @@ const ChatBot = () => {
             parts: [{ text: modelResponse }],
           },
         ];
-
-        setChat(updatedChatWithModel); // Update chat with model's response
+        setChat(updatedChatWithModel);
         setUserInput("");
       }
     } catch (error) {
-      console.error("Error while calling Gemini Pro API:", error);
+      console.error("Error response data:", error.response?.data || error.message);
       setError("Oops! Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
   };
+  
 
   const handleSpeech = async (text) => {
     if (isSpeaking) {
@@ -79,15 +79,13 @@ const ChatBot = () => {
     }
   };
 
-  const renderChatItem = ({ item }) => {
-    return (
-      <ChatBubble
-        role={item.role}
-        text={item.parts[0].text}
-        onSpeech={() => handleSpeech(item.parts[0].text)}
-      />
-    );
-  };
+  const renderChatItem = ({ item }) => (
+    <ChatBubble
+      role={item.role}
+      text={item.parts[0].text}
+      onSpeech={() => handleSpeech(item.parts[0].text)}
+    />
+  );
 
   return (
     <View style={styles.container}>
@@ -123,21 +121,19 @@ const ChatBot = () => {
   );
 };
 
-const ChatBubble = ({ role, text, onSpeech }) => {
-  return (
-    <View
-      style={[
-        styles.chatBubble,
-        role === "user" ? styles.userBubble : styles.modelBubble,
-      ]}
-    >
-      <Text style={styles.chatText}>{text}</Text>
-      <TouchableOpacity onPress={onSpeech}>
-        <Text style={styles.speakButton}>🔊</Text>
-      </TouchableOpacity>
-    </View>
-  );
-};
+// const ChatBubble = ({ role, text, onSpeech }) => (
+//   <View
+//     style={[
+//       styles.chatBubble,
+//       role === "user" ? styles.userBubble : styles.modelBubble,
+//     ]}
+//   >
+//     <Text style={styles.chatText}>{text}</Text>
+//     <TouchableOpacity onPress={onSpeech}>
+//       <Text style={styles.speakButton}>🔊</Text>
+//     </TouchableOpacity>
+//   </View>
+// );
 
 const styles = StyleSheet.create({
   container: {
