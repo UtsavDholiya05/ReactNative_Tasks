@@ -12,11 +12,10 @@ import {
 import { useState } from "react";
 import * as Speech from "expo-speech";
 import axios from "axios";
-import { useSafeAreaFrame } from "react-native-safe-area-context";
 
 const ChatBot = () => {
-  const [chat, setChat] = useState([]); // [] empty array that will hold chat messages
-  const [userInput, setUserInput] = useState(""); // "" empty string to hold user input
+  const [chat, setChat] = useState([]);
+  const [userInput, setUserInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [isSpeaking, setIsSpeaking] = useState(false);
@@ -24,7 +23,7 @@ const ChatBot = () => {
   const API_KEY = "AIzaSyAdudW--AGSvnD59Uo6YNRvKIDL5Qj-Tq0";
 
   const handleUserInput = async () => {
-    // Add user input to chat
+    if (!userInput.trim()) return; 
     let updatedChat = [
       ...chat,
       {
@@ -32,22 +31,23 @@ const ChatBot = () => {
         parts: [{ text: userInput }],
       },
     ];
+    setChat(updatedChat); 
     setLoading(true);
 
     try {
       const response = await axios.post(
-        `https://generativelanguage.googleapis.com/vlbeta/models/gemini-pro:generateContent?key=${API_KEY}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`,
         {
-          contents: updatedChat, // corrected from 'contets' to 'contents'
+          prompt: { contents: [{ text: userInput }] }, 
         }
       );
 
       console.log("Gemini Pro API Response:", response.data);
 
-      const modelResponse = response.data?.[0]?.content?.parts?.[0]?.text || "";
+
+      const modelResponse = response.data?.candidates?.[0]?.text || "";
 
       if (modelResponse) {
-        // Add model response to chat
         const updatedChatWithModel = [
           ...updatedChat,
           {
@@ -56,12 +56,12 @@ const ChatBot = () => {
           },
         ];
 
-        setChat(updatedChatWithModel);
+        setChat(updatedChatWithModel); // Update chat with model's response
         setUserInput("");
       }
     } catch (error) {
       console.error("Error while calling Gemini Pro API:", error);
-      setError("An error occurred. Please try again.");
+      setError("Oops! Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -99,13 +99,6 @@ const ChatBot = () => {
         keyExtractor={(item, index) => index.toString()}
         contentContainerStyle={styles.chatContainer}
       />
-      {/* <TextInput
-        style={styles.input}
-        value={userInput}
-        onChangeText={setUserInput}
-        placeholder="Type your message..."
-      />
-      <Button title="Send" onPress={handleUserInput} disabled={loading || !userInput} /> */}
 
       <View style={styles.inputContainer}>
         <TextInput
@@ -115,11 +108,14 @@ const ChatBot = () => {
           value={userInput}
           onChangeText={setUserInput}
         />
+        <TouchableOpacity
+          style={styles.sendButton}
+          onPress={handleUserInput}
+          disabled={loading || !userInput}
+        >
+          <Text style={styles.buttonText}>Send</Text>
+        </TouchableOpacity>
       </View>
-
-      <TouchableOpacity style={styles.loading} color="#333">
-        <Text style={styles.buttonText}>Send</Text>
-      </TouchableOpacity>
 
       {loading && <ActivityIndicator style={styles.loading} color="#333" />}
       {error && <Text style={styles.errorText}>{error}</Text>}
@@ -127,7 +123,22 @@ const ChatBot = () => {
   );
 };
 
-// Define your styles here
+const ChatBubble = ({ role, text, onSpeech }) => {
+  return (
+    <View
+      style={[
+        styles.chatBubble,
+        role === "user" ? styles.userBubble : styles.modelBubble,
+      ]}
+    >
+      <Text style={styles.chatText}>{text}</Text>
+      <TouchableOpacity onPress={onSpeech}>
+        <Text style={styles.speakButton}>🔊</Text>
+      </TouchableOpacity>
+    </View>
+  );
+};
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -137,39 +148,83 @@ const styles = StyleSheet.create({
   chatContainer: {
     flexGrow: 1,
     justifyContent: "flex-end",
+    paddingBottom: 10,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 20,
+    textAlign: "center",
+    color: "#333",
   },
   inputContainer: {
     flexDirection: "row",
-    alignContent: "center",
+    alignItems: "center",
     marginTop: 10,
+    backgroundColor: "#fff",
+    borderRadius: 25,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    elevation: 3,
   },
   input: {
     flex: 1,
-    height: 50,
-    marginRight: 10,
-    padding: 8,
-    borderColor: "#333",
+    height: 45,
+    paddingLeft: 15,
+    borderColor: "#ccc",
     borderWidth: 1,
     borderRadius: 25,
     color: "#333",
     backgroundColor: "#fff",
+    marginRight: 10,
   },
-  button: {
-    padding: 10,
+  sendButton: {
     backgroundColor: "#007AFF",
     borderRadius: 25,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 2,
   },
   buttonText: {
     color: "#fff",
-    textAlign: "center",
-    color: "black",
+    fontWeight: "bold",
+    fontSize: 16,
   },
-  error: {
+  errorText: {
     color: "red",
-    marginBottom: 10,
+    textAlign: "center",
+    marginTop: 10,
   },
   loading: {
     marginTop: 10,
+  },
+  chatBubble: {
+    padding: 10,
+    marginVertical: 5,
+    borderRadius: 10,
+    maxWidth: "75%",
+    alignSelf: "flex-start",
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  userBubble: {
+    backgroundColor: "#007AFF",
+    alignSelf: "flex-end",
+  },
+  modelBubble: {
+    backgroundColor: "#ddd",
+  },
+  chatText: {
+    color: "#fff",
+  },
+  speakButton: {
+    marginLeft: 10,
+    fontSize: 18,
+    color: "#333",
   },
 });
 
