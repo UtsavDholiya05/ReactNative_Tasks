@@ -1,16 +1,17 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   View,
   StyleSheet,
   Text,
+  Button,
   FlatList,
   TextInput,
   TouchableOpacity,
   ActivityIndicator,
 } from "react-native";
+import { useState } from "react";
 import * as Speech from "expo-speech";
 import axios from "axios";
-import ChatBubble from "./ChatBubble";
 
 const ChatBot = () => {
   const [chat, setChat] = useState([]);
@@ -19,12 +20,9 @@ const ChatBot = () => {
   const [error, setError] = useState(null);
   const [isSpeaking, setIsSpeaking] = useState(false);
 
-  // Replace this with your actual API Key
-  const API_KEY = "AIzaSyDJ_H0p_9H9mVSj_KBK9qRbrstdhCxiZv8";
+  const API_KEY = "AIzaSyAdudW--AGSvnD59Uo6YNRvKIDL5Qj-Tq0";
 
   const handleUserInput = async () => {
-    if (!userInput.trim()) return;
-
     let updatedChat = [
       ...chat,
       {
@@ -32,21 +30,17 @@ const ChatBot = () => {
         parts: [{ text: userInput }],
       },
     ];
-    setChat(updatedChat);
     setLoading(true);
 
     try {
-      // Correct API endpoint and model name
       const response = await axios.post(
-        `https://generativelanguage.googleapis.com/v1beta2/models/models/gemini-1.5:generateText?key=${API_KEY}`,
+        `https://generativelanguage.googleapis.com/vlbeta/models/gemini-pro:generateContent?key=${API_KEY}`,
         {
-          prompt: {
-            text: userInput,
-          },
+          contents: updatedChat,
         }
       );
 
-      const modelResponse = response.data?.candidates?.[0]?.output || "";
+      const modelResponse = response.data?.[0]?.content?.parts?.[0]?.text || "";
 
       if (modelResponse) {
         const updatedChatWithModel = [
@@ -56,12 +50,12 @@ const ChatBot = () => {
             parts: [{ text: modelResponse }],
           },
         ];
+
         setChat(updatedChatWithModel);
         setUserInput("");
       }
     } catch (error) {
-      console.error("Error response data:", error.response?.data || error.message);
-      setError("Oops! Something went wrong. Please try again.");
+      setError("An error occurred. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -79,13 +73,15 @@ const ChatBot = () => {
     }
   };
 
-  const renderChatItem = ({ item }) => (
-    <ChatBubble
-      role={item.role}
-      text={item.parts[0].text}
-      onSpeech={() => handleSpeech(item.parts[0].text)}
-    />
-  );
+  const renderChatItem = ({ item }) => {
+    return (
+      <ChatBubble
+        role={item.role}
+        text={item.parts[0].text}
+        onSpeech={() => handleSpeech(item.parts[0].text)}
+      />
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -97,7 +93,7 @@ const ChatBot = () => {
         keyExtractor={(item, index) => index.toString()}
         contentContainerStyle={styles.chatContainer}
       />
-
+      
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
@@ -107,7 +103,7 @@ const ChatBot = () => {
           onChangeText={setUserInput}
         />
         <TouchableOpacity
-          style={styles.sendButton}
+          style={styles.button}
           onPress={handleUserInput}
           disabled={loading || !userInput}
         >
@@ -121,106 +117,96 @@ const ChatBot = () => {
   );
 };
 
-// const ChatBubble = ({ role, text, onSpeech }) => (
-//   <View
-//     style={[
-//       styles.chatBubble,
-//       role === "user" ? styles.userBubble : styles.modelBubble,
-//     ]}
-//   >
-//     <Text style={styles.chatText}>{text}</Text>
-//     <TouchableOpacity onPress={onSpeech}>
-//       <Text style={styles.speakButton}>🔊</Text>
-//     </TouchableOpacity>
-//   </View>
-// );
+const ChatBubble = ({ role, text, onSpeech }) => {
+  const isUser = role === "user";
+  return (
+    <View
+      style={[
+        styles.chatBubble,
+        isUser ? styles.userBubble : styles.modelBubble,
+      ]}
+    >
+      <TouchableOpacity onPress={onSpeech}>
+        <Text style={[styles.chatText, isUser ? styles.userText : styles.modelText]}>{text}</Text>
+      </TouchableOpacity>
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: "#f8f8f8",
+    backgroundColor: "#f0f0f0",
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: "bold",
+    marginBottom: 10,
+    textAlign: "center",
   },
   chatContainer: {
     flexGrow: 1,
     justifyContent: "flex-end",
-    paddingBottom: 10,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 20,
-    textAlign: "center",
-    color: "#333",
-  },
-  inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: 10,
-    backgroundColor: "#fff",
-    borderRadius: 25,
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    elevation: 3,
-  },
-  input: {
-    flex: 1,
-    height: 45,
-    paddingLeft: 15,
-    borderColor: "#ccc",
-    borderWidth: 1,
-    borderRadius: 25,
-    color: "#333",
-    backgroundColor: "#fff",
-    marginRight: 10,
-  },
-  sendButton: {
-    backgroundColor: "#007AFF",
-    borderRadius: 25,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  buttonText: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 16,
-  },
-  errorText: {
-    color: "red",
-    textAlign: "center",
-    marginTop: 10,
-  },
-  loading: {
-    marginTop: 10,
+    paddingBottom: 16,
   },
   chatBubble: {
-    padding: 10,
-    marginVertical: 5,
-    borderRadius: 10,
-    maxWidth: "75%",
+    padding: 12,
+    marginVertical: 8,
+    borderRadius: 20,
+    maxWidth: "80%",
     alignSelf: "flex-start",
-    flexDirection: "row",
-    alignItems: "center",
   },
   userBubble: {
     backgroundColor: "#007AFF",
     alignSelf: "flex-end",
   },
   modelBubble: {
-    backgroundColor: "#ddd",
+    backgroundColor: "#e5e5ea",
   },
   chatText: {
+    fontSize: 16,
+  },
+  userText: {
     color: "#fff",
   },
-  speakButton: {
-    marginLeft: 10,
-    fontSize: 18,
+  modelText: {
     color: "#333",
+  },
+  inputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 10,
+  },
+  input: {
+    flex: 1,
+    height: 50,
+    marginRight: 10,
+    paddingHorizontal: 15,
+    borderColor: "#333",
+    borderWidth: 1,
+    borderRadius: 25,
+    backgroundColor: "#fff",
+    fontSize: 16,
+    color: "#333",
+  },
+  button: {
+    backgroundColor: "#007AFF",
+    borderRadius: 25,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  loading: {
+    marginTop: 10,
+  },
+  errorText: {
+    color: "red",
+    marginTop: 10,
   },
 });
 
