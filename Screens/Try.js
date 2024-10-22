@@ -24,7 +24,7 @@ const ChatBot = () => {
 
   const handleUserInput = async () => {
     if (!userInput.trim()) return;
-
+  
     let updatedChat = [
       ...chat,
       {
@@ -34,20 +34,19 @@ const ChatBot = () => {
     ];
     setChat(updatedChat);
     setLoading(true);
-
+  
     try {
-      // Correct API endpoint and model name
       const response = await axios.post(
-        `https://generativelanguage.googleapis.com/v1beta2/models/models/gemini-1.5:generateText?key=${API_KEY}`,
+        `https://generativelanguage.googleapis.com/v1beta2/models/gemini-1.5:generateText?key=${API_KEY}`,
         {
           prompt: {
             text: userInput,
           },
         }
       );
-
+  
       const modelResponse = response.data?.candidates?.[0]?.output || "";
-
+  
       if (modelResponse) {
         const updatedChatWithModel = [
           ...updatedChat,
@@ -58,6 +57,8 @@ const ChatBot = () => {
         ];
         setChat(updatedChatWithModel);
         setUserInput("");
+      } else {
+        setError("No response received from the model.");
       }
     } catch (error) {
       console.error("Error response data:", error.response?.data || error.message);
@@ -66,6 +67,7 @@ const ChatBot = () => {
       setLoading(false);
     }
   };
+  
 
   const handleSpeech = async (text) => {
     if (isSpeaking) {
