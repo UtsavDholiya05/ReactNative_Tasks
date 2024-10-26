@@ -20,7 +20,7 @@ const ChatBot = () => {
   const [isSpeaking, setIsSpeaking] = useState(false);
 
 
-  const API_KEY = "AIzaSyDJ_H0p_9H9mVSj_KBK9qRbrstdhCxiZv8";
+  const API_KEY = "AIzaSyCYa_mDvvOnzy0yfn3zfjS-Dtp8Qq8stcI";
 
   const handleUserInput = async () => {
     if (!userInput.trim()) return;
