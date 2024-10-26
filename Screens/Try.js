@@ -1,3 +1,5 @@
+// Import the API key from @env
+import { GEMINI_API_KEY } from '@env';
 import React, { useState } from "react";
 import {
   View,
@@ -12,19 +14,19 @@ import * as Speech from "expo-speech";
 import axios from "axios";
 import ChatBubble from "./ChatBubble";
 
-const ChatBot = () => {
+const Try = () => {
   const [chat, setChat] = useState([]);
   const [userInput, setUserInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [isSpeaking, setIsSpeaking] = useState(false);
 
-
-  const API_KEY = process.env.GEMINI_API_KEY;
+  // Use the imported API key
+  const API_KEY = GEMINI_API_KEY;
 
   const handleUserInput = async () => {
     if (!userInput.trim()) return;
-  
+
     let updatedChat = [
       ...chat,
       {
@@ -34,7 +36,7 @@ const ChatBot = () => {
     ];
     setChat(updatedChat);
     setLoading(true);
-  
+
     try {
       const response = await axios.post(
         `https://generativelanguage.googleapis.com/v1beta2/models/gemini-1.5:generateText?key=${API_KEY}`,
@@ -44,9 +46,9 @@ const ChatBot = () => {
           },
         }
       );
-  
+
       const modelResponse = response.data?.candidates?.[0]?.output || "";
-  
+
       if (modelResponse) {
         const updatedChatWithModel = [
           ...updatedChat,
@@ -67,7 +69,6 @@ const ChatBot = () => {
       setLoading(false);
     }
   };
-  
 
   const handleSpeech = async (text) => {
     if (isSpeaking) {
@@ -122,20 +123,6 @@ const ChatBot = () => {
     </View>
   );
 };
-
-// const ChatBubble = ({ role, text, onSpeech }) => (
-//   <View
-//     style={[
-//       styles.chatBubble,
-//       role === "user" ? styles.userBubble : styles.modelBubble,
-//     ]}
-//   >
-//     <Text style={styles.chatText}>{text}</Text>
-//     <TouchableOpacity onPress={onSpeech}>
-//       <Text style={styles.speakButton}>🔊</Text>
-//     </TouchableOpacity>
-//   </View>
-// );
 
 const styles = StyleSheet.create({
   container: {
@@ -200,30 +187,6 @@ const styles = StyleSheet.create({
   loading: {
     marginTop: 10,
   },
-  chatBubble: {
-    padding: 10,
-    marginVertical: 5,
-    borderRadius: 10,
-    maxWidth: "75%",
-    alignSelf: "flex-start",
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  userBubble: {
-    backgroundColor: "#007AFF",
-    alignSelf: "flex-end",
-  },
-  modelBubble: {
-    backgroundColor: "#ddd",
-  },
-  chatText: {
-    color: "#fff",
-  },
-  speakButton: {
-    marginLeft: 10,
-    fontSize: 18,
-    color: "#333",
-  },
 });
 
-export default ChatBot;
+export default Try;
