@@ -1,3 +1,4 @@
+// import { GEMINI_API_KEY } from '@env';
 import React, { useState } from "react";
 import {
   View,
@@ -12,19 +13,20 @@ import * as Speech from "expo-speech";
 import axios from "axios";
 import ChatBubble from "./ChatBubble";
 
-const ChatBot = () => {
+const Try = () => {
   const [chat, setChat] = useState([]);
   const [userInput, setUserInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [isSpeaking, setIsSpeaking] = useState(false);
 
-  // Replace this with your actual API Key
-  const API_KEY = "AIzaSyDJ_H0p_9H9mVSj_KBK9qRbrstdhCxiZv8";
+  // Use the imported API key
+  const API_KEY = "AIzaSyAdudW--AGSvnD59Uo6YNRvKIDL5Qj-Tq0";
 
   const handleUserInput = async () => {
     if (!userInput.trim()) return;
   
+    // Add user message to chat
     let updatedChat = [
       ...chat,
       {
@@ -36,18 +38,21 @@ const ChatBot = () => {
     setLoading(true);
   
     try {
+      // Sending chat contents in the required API format
       const response = await axios.post(
-        `https://generativelanguage.googleapis.com/v1beta2/models/gemini-1.5:generateText?key=${API_KEY}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`,
         {
-          prompt: {
-            text: userInput,
-          },
+          messages: updatedChat.map(item => ({
+            role: item.role,
+            content: item.parts[0].text,
+          })),
         }
       );
   
-      const modelResponse = response.data?.candidates?.[0]?.output || "";
-  
+      // Extracting the model's response text
+      const modelResponse = response.data?.candidates?.[0]?.content || "";
       if (modelResponse) {
+        // Update chat with model's reply
         const updatedChatWithModel = [
           ...updatedChat,
           {
@@ -71,11 +76,11 @@ const ChatBot = () => {
 
   const handleSpeech = async (text) => {
     if (isSpeaking) {
-      Speech.stop();
+      stop();
       setIsSpeaking(false);
     } else {
       if (!(await Speech.isSpeakingAsync())) {
-        Speech.speak(text);
+        speak(text);
         setIsSpeaking(true);
       }
     }
@@ -122,20 +127,6 @@ const ChatBot = () => {
     </View>
   );
 };
-
-// const ChatBubble = ({ role, text, onSpeech }) => (
-//   <View
-//     style={[
-//       styles.chatBubble,
-//       role === "user" ? styles.userBubble : styles.modelBubble,
-//     ]}
-//   >
-//     <Text style={styles.chatText}>{text}</Text>
-//     <TouchableOpacity onPress={onSpeech}>
-//       <Text style={styles.speakButton}>🔊</Text>
-//     </TouchableOpacity>
-//   </View>
-// );
 
 const styles = StyleSheet.create({
   container: {
@@ -197,33 +188,12 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: 10,
   },
-  loading: {
+  loading: { 
     marginTop: 10,
-  },
-  chatBubble: {
-    padding: 10,
-    marginVertical: 5,
-    borderRadius: 10,
-    maxWidth: "75%",
-    alignSelf: "flex-start",
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  userBubble: {
-    backgroundColor: "#007AFF",
-    alignSelf: "flex-end",
-  },
-  modelBubble: {
-    backgroundColor: "#ddd",
-  },
-  chatText: {
-    color: "#fff",
-  },
-  speakButton: {
-    marginLeft: 10,
-    fontSize: 18,
-    color: "#333",
   },
 });
 
-export default ChatBot;
+export default Try;
+
+
+//UPDATED WITH GPT ADDITIONAL IN HANDLEUSERINPUT IN IF ROLE PART

@@ -1,5 +1,4 @@
-// Import the API key from @env
-import { GEMINI_API_KEY } from '@env';
+// import { GEMINI_API_KEY } from '@env';
 import React, { useState } from "react";
 import {
   View,
@@ -22,7 +21,7 @@ const Try = () => {
   const [isSpeaking, setIsSpeaking] = useState(false);
 
   // Use the imported API key
-  const API_KEY = GEMINI_API_KEY;
+  const API_KEY = "AIzaSyAdudW--AGSvnD59Uo6YNRvKIDL5Qj-Tq0";
 
   const handleUserInput = async () => {
     if (!userInput.trim()) return;
@@ -38,14 +37,18 @@ const Try = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post(
-        `https://generativelanguage.googleapis.com/v1beta2/models/gemini-1.5:generateText?key=${API_KEY}`,
+      const response= await axios.post(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`,
         {
-          prompt: {
-            text: userInput,
-          },
+          contents: updatedChat
         }
       );
+      console.log("response: ",response.data);
+      //console.log(response.data[0]);
+      
+      console.log(response.data.candidates[0]);
+      console.log(response.data.candidates[0].content);
+      console.log(response.data.candidates[0].content.parts[0].text)
+      console.log(modelResponse);
 
       const modelResponse = response.data?.candidates?.[0]?.output || "";
 
@@ -72,11 +75,11 @@ const Try = () => {
 
   const handleSpeech = async (text) => {
     if (isSpeaking) {
-      Speech.stop();
+      stop();
       setIsSpeaking(false);
     } else {
       if (!(await Speech.isSpeakingAsync())) {
-        Speech.speak(text);
+        speak(text);
         setIsSpeaking(true);
       }
     }
