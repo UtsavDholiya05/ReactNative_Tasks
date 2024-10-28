@@ -37,20 +37,20 @@ const Try = () => {
     setLoading(true);
 
     try {
-      const response= await axios.post(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`,
+      const response= await axios.post(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${API_KEY}`,
         {
           contents: updatedChat
         }
       );
-      console.log("response: ",response.data);
-      //console.log(response.data[0]);
+      // console.log("response: ",response.data);
+      // //console.log(response.data[0]);
       
-      console.log(response.data.candidates[0]);
-      console.log(response.data.candidates[0].content);
-      console.log(response.data.candidates[0].content.parts[0].text)
-      console.log(modelResponse);
+      // console.log(response.data.candidates[0]);
+      // console.log(response.data.candidates[0].content);
+      // console.log(response.data.candidates[0].content.parts[0].text)
+      // console.log(modelResponse);
 
-      const modelResponse = response.data?.candidates?.[0]?.output || "";
+      const modelResponse=response.data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
 
       if (modelResponse) {
         const updatedChatWithModel = [
@@ -75,11 +75,11 @@ const Try = () => {
 
   const handleSpeech = async (text) => {
     if (isSpeaking) {
-      stop();
+      Speech.stop();
       setIsSpeaking(false);
     } else {
       if (!(await Speech.isSpeakingAsync())) {
-        speak(text);
+        Speech.speak(text);
         setIsSpeaking(true);
       }
     }
