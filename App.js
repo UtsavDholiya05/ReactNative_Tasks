@@ -12,7 +12,7 @@ import { UserProvider } from "./Context/Login";
 import { FavoritesProvider } from "./Context/EditFavorite";
 import EditProfile from "./Screens/EditProfile";
 import Welcome from "./Screens/Welcome"
-import Try from "./Screens/Try"
+import ChatBot from "./Screens/ChatBot";
 
 
 const Stack = createNativeStackNavigator();
@@ -31,9 +31,8 @@ function Tabs() {
             iconName = focused ? "star" : "star-outline";
           } else if (route.name === "Profile") {
             iconName = focused ? "person" : "person-outline";
-          }
-          else if (route.name === "try") {
-            iconName = focused ? "person" : "person-outline";
+          } else if (route.name === "ChatBot") {
+            iconName = focused ? "chatbox" : "chatbox-outline";
           }
 
           return <Ionicons name={iconName} size={size} color={color} />;
@@ -43,10 +42,11 @@ function Tabs() {
       <Tab.Screen name="Popular Movies" component={HomeScreen} />
       <Tab.Screen name="Favourite" component={FavouriteScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
-      <Tab.Screen name="try" component={Try} />
+      <Tab.Screen name="ChatBot" component={ChatBot} />
     </Tab.Navigator>
   );
 }
+
 
 function ProfileComponent() {
   return (

@@ -1,4 +1,4 @@
-// import { GEMINI_API_KEY } from '@env';
+import { GEMINI_API_KEY } from "@env";
 import React, { useState } from "react";
 import {
   View,
@@ -8,25 +8,24 @@ import {
   TextInput,
   TouchableOpacity,
   ActivityIndicator,
+  ImageBackground
 } from "react-native";
 import * as Speech from "expo-speech";
 import axios from "axios";
 import ChatBubble from "./ChatBubble";
 
-const Try = () => {
+const ChatBot = () => {
   const [chat, setChat] = useState([]);
   const [userInput, setUserInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [isSpeaking, setIsSpeaking] = useState(false);
 
-  // Use the imported API key
-  const API_KEY = "AIzaSyAdudW--AGSvnD59Uo6YNRvKIDL5Qj-Tq0";
+  const API_KEY = GEMINI_API_KEY;
 
   const handleUserInput = async () => {
     if (!userInput.trim()) return;
-  
-    // Add user message to chat
+
     let updatedChat = [
       ...chat,
       {
@@ -36,23 +35,26 @@ const Try = () => {
     ];
     setChat(updatedChat);
     setLoading(true);
-  
+
     try {
-      // Sending chat contents in the required API format
       const response = await axios.post(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${API_KEY}`,
         {
-          messages: updatedChat.map(item => ({
-            role: item.role,
-            content: item.parts[0].text,
-          })),
+          contents: updatedChat,
         }
       );
-  
-      // Extracting the model's response text
-      const modelResponse = response.data?.candidates?.[0]?.content || "";
+      // console.log("response: ",response.data);
+      // //console.log(response.data[0]);
+
+      // console.log(response.data.candidates[0]);
+      // console.log(response.data.candidates[0].content);
+      // console.log(response.data.candidates[0].content.parts[0].text)
+      // console.log(modelResponse);
+
+      const modelResponse =
+        response.data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+
       if (modelResponse) {
-        // Update chat with model's reply
         const updatedChatWithModel = [
           ...updatedChat,
           {
@@ -66,21 +68,23 @@ const Try = () => {
         setError("No response received from the model.");
       }
     } catch (error) {
-      console.error("Error response data:", error.response?.data || error.message);
+      console.error(
+        "Error response data:",
+        error.response?.data || error.message
+      );
       setError("Oops! Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
   };
-  
 
   const handleSpeech = async (text) => {
     if (isSpeaking) {
-      stop();
+      Speech.stop();
       setIsSpeaking(false);
     } else {
       if (!(await Speech.isSpeakingAsync())) {
-        speak(text);
+        Speech.speak(text);
         setIsSpeaking(true);
       }
     }
@@ -95,8 +99,13 @@ const Try = () => {
   );
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Gemini Chatbox</Text>
+    
+    <View>
+      <ImageBackground
+        source={require("../t/WhatsApp Image 2024-09-28 at 21.29.25_158d91f3.jpg")}
+        style={{ height: "100%", width: "100%" }}
+      >
+      <Text style={styles.title}>ChatBot</Text>
 
       <FlatList
         data={chat}
@@ -122,9 +131,10 @@ const Try = () => {
         </TouchableOpacity>
       </View>
 
-      {loading && <ActivityIndicator style={styles.loading} color="#333" />}
+      {loading && <ActivityIndicator style={styles.loading} color="#fff" />}
       {error && <Text style={styles.errorText}>{error}</Text>}
-    </View>
+      </ImageBackground>
+      </View>
   );
 };
 
@@ -144,7 +154,8 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 20,
     textAlign: "center",
-    color: "#333",
+    color: "#fff",
+    marginTop: 20
   },
   inputContainer: {
     flexDirection: "row",
@@ -155,6 +166,8 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     paddingHorizontal: 10,
     elevation: 3,
+    marginBottom:10,
+    marginHorizontal: 10
   },
   input: {
     flex: 1,
@@ -188,12 +201,9 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: 10,
   },
-  loading: { 
-    marginTop: 10,
+  loading: {
+    marginVertical: 10,
   },
 });
 
-export default Try;
-
-
-//UPDATED WITH GPT ADDITIONAL IN HANDLEUSERINPUT IN IF ROLE PART
+export default ChatBot;
