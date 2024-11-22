@@ -11,9 +11,8 @@ import FavouriteScreen from "./Screens/FavouriteScreen";
 import { UserProvider } from "./Context/Login";
 import { FavoritesProvider } from "./Context/EditFavorite";
 import EditProfile from "./Screens/EditProfile";
-import Welcome from "./Screens/Welcome"
+import Welcome from "./Screens/Welcome";
 import ChatBot from "./Screens/ChatBot";
-
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -47,15 +46,15 @@ function Tabs() {
   );
 }
 
-
 function ProfileComponent() {
   return (
-    // <NavigationContainer>
-      <Stack.Navigator>
-        {/* <Stack.Screen name="Profile" component={ProfileScreen} /> */}
-        <Stack.Screen name="EditProfile" component={EditProfile} options={{ headerShown: false }}/>
-      </Stack.Navigator>
-    // </NavigationContainer>
+    <Stack.Navigator>
+      <Stack.Screen
+        name="EditProfile"
+        component={EditProfile}
+        options={{ headerShown: false }}
+      />
+    </Stack.Navigator>
   );
 }
 
@@ -65,18 +64,20 @@ export default function App() {
       <FavoritesProvider>
         <NavigationContainer>
           <Stack.Navigator initialRouteName="Home">
-            {/* <Stack.Screen name="Home" component={HomeScreen} /> */}
             <Stack.Screen name="Login" component={LoginScreen} />
             <Stack.Screen name="Sign Up" component={SignupScreen} />
             <Stack.Screen name="Welcome" component={Welcome} />
-            
+
             <Stack.Screen
               name="Home"
               component={Tabs}
               options={{ headerShown: false }}
             />
 
-            <Stack.Screen name="ProfileComponent" component={ProfileComponent}/>
+            <Stack.Screen
+              name="ProfileComponent"
+              component={ProfileComponent}
+            />
           </Stack.Navigator>
         </NavigationContainer>
       </FavoritesProvider>

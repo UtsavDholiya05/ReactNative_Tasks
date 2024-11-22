@@ -8,7 +8,7 @@ import {
   TextInput,
   TouchableOpacity,
   ActivityIndicator,
-  ImageBackground
+  ImageBackground,
 } from "react-native";
 import * as Speech from "expo-speech";
 import axios from "axios";
@@ -43,13 +43,7 @@ const ChatBot = () => {
           contents: updatedChat,
         }
       );
-      // console.log("response: ",response.data);
-      // //console.log(response.data[0]);
-
-      // console.log(response.data.candidates[0]);
-      // console.log(response.data.candidates[0].content);
-      // console.log(response.data.candidates[0].content.parts[0].text)
-      // console.log(modelResponse);
+     
 
       const modelResponse =
         response.data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
@@ -99,42 +93,41 @@ const ChatBot = () => {
   );
 
   return (
-    
     <View>
       <ImageBackground
         source={require("../t/WhatsApp Image 2024-09-28 at 21.29.25_158d91f3.jpg")}
         style={{ height: "100%", width: "100%" }}
       >
-      <Text style={styles.title}>ChatBot</Text>
+        <Text style={styles.title}>ChatBot</Text>
 
-      <FlatList
-        data={chat}
-        renderItem={renderChatItem}
-        keyExtractor={(item, index) => index.toString()}
-        contentContainerStyle={styles.chatContainer}
-      />
-
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder="Type your message"
-          placeholderTextColor="#aaa"
-          value={userInput}
-          onChangeText={setUserInput}
+        <FlatList
+          data={chat}
+          renderItem={renderChatItem}
+          keyExtractor={(item, index) => index.toString()}
+          contentContainerStyle={styles.chatContainer}
         />
-        <TouchableOpacity
-          style={styles.sendButton}
-          onPress={handleUserInput}
-          disabled={loading || !userInput}
-        >
-          <Text style={styles.buttonText}>Send</Text>
-        </TouchableOpacity>
-      </View>
 
-      {loading && <ActivityIndicator style={styles.loading} color="#fff" />}
-      {error && <Text style={styles.errorText}>{error}</Text>}
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Type your message"
+            placeholderTextColor="#aaa"
+            value={userInput}
+            onChangeText={setUserInput}
+          />
+          <TouchableOpacity
+            style={styles.sendButton}
+            onPress={handleUserInput}
+            disabled={loading || !userInput}
+          >
+            <Text style={styles.buttonText}>Send</Text>
+          </TouchableOpacity>
+        </View>
+
+        {loading && <ActivityIndicator style={styles.loading} color="#fff" />}
+        {error && <Text style={styles.errorText}>{error}</Text>}
       </ImageBackground>
-      </View>
+    </View>
   );
 };
 
@@ -155,7 +148,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlign: "center",
     color: "#fff",
-    marginTop: 20
+    marginTop: 20,
   },
   inputContainer: {
     flexDirection: "row",
@@ -166,8 +159,8 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     paddingHorizontal: 10,
     elevation: 3,
-    marginBottom:10,
-    marginHorizontal: 10
+    marginBottom: 10,
+    marginHorizontal: 10,
   },
   input: {
     flex: 1,
