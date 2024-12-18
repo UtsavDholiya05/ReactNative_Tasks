@@ -286,14 +286,15 @@ export default function SignupScreen({ navigation }) {
             style={styles.buttonTO}
             onPress={handleSubmit}
             disabled={
+              !Name ||
               !email ||
               !password ||
               !confirmpassword ||
-              !Name ||
-              emailError ||
-              passwordError ||
-              confirmpasswordError ||
-              NameError
+              !profilePhoto ||
+              !!NameError ||
+              !!emailError ||
+              !!passwordError ||
+              !!confirmpasswordError
             }
           >
             {loading ? (
@@ -400,6 +401,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     color: "red",
+    textAlign: "center", // Center the error message horizontally
     marginBottom: 10,
     width: "90%",
     alignSelf: "center",

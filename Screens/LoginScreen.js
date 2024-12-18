@@ -8,7 +8,7 @@ import {
   ImageBackground,
   ActivityIndicator,
 } from "react-native";
-import {useState} from "react";
+import { useState } from "react";
 import Icon from "react-native-vector-icons/FontAwesome";
 
 export default function LoginScreen({ navigation }) {
@@ -16,7 +16,7 @@ export default function LoginScreen({ navigation }) {
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false); // Ensure this is a boolean
   const [loading, setLoading] = useState(false);
 
   // Email validation regex
@@ -44,25 +44,27 @@ export default function LoginScreen({ navigation }) {
     validateEmail(email);
     validatePassword(password);
 
-    if (emailError === "" && passwordError === "" && email && password) {
-      setLoading(true); // loading true when login process
-
-      setTimeout(() => {
-        alert("Login Successful!");
-        setLoading(false);
-        navigation.navigate("Home");
-      }, 1000);
+    if (emailError || passwordError || !email || !password) {
+      return; // Stop further execution if there's any validation error
     }
+
+    setLoading(true);
+
+    setTimeout(() => {
+      alert("Login Successful!");
+      setLoading(false);
+      navigation.navigate("Home");
+    }, 1000);
   };
 
   const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
+    setShowPassword((prevState) => !prevState); // Properly toggle the boolean state
   };
 
   return (
-    <KeyboardAvoidingView>
+    <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
       <ImageBackground
-        source={require("../t/WhatsApp Image 2024-09-28 at 21.29.25_158d91f3.jpg")}
+        source={require("../t/WhatsApp Image 2024-09-28 at 21.29.25_158d91f3.jpg")} 
         style={{ height: "100%", width: "100%" }}
       >
         <Text
@@ -94,8 +96,9 @@ export default function LoginScreen({ navigation }) {
           <TextInput
             style={styles.input}
             placeholder="Enter your Email address"
-            keyboardType={"email-address"}
+            keyboardType="email-address"
             onChangeText={validateEmail}
+            value={email}
           />
         </View>
 
@@ -107,8 +110,9 @@ export default function LoginScreen({ navigation }) {
             placeholder="Enter your password"
             secureTextEntry={!showPassword}
             onChangeText={validatePassword}
+            value={password}
           />
-          <TouchableOpacity onPress={togglePasswordVisibility} style={styles.touch}>
+          <TouchableOpacity onPress={togglePasswordVisibility}>
             <Icon
               name={showPassword ? "eye" : "eye-slash"}
               style={styles.iconStyle}
@@ -134,11 +138,9 @@ export default function LoginScreen({ navigation }) {
 
         <View>
           <TouchableOpacity
-            style={[styles.buttonTO]}
+            style={[styles.buttonTO, { justifyContent: "center", alignItems: "center" }]} // Centering the button
             onPress={handleSubmit}
-            disabled={
-              !email || !password || emailError || passwordError || loading
-            }
+            disabled={!email || !password || !!emailError || !!passwordError}
           >
             {loading ? (
               <ActivityIndicator size="small" color="#fff" />
@@ -206,6 +208,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     color: "red",
+    textAlign: "center", // Center the error message horizontally
     marginBottom: 10,
     width: "90%",
     alignSelf: "center",
@@ -225,7 +228,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between", // Ensure space between input and icon
   },
   input1: {
-    flex: 1,  // Take up most of the width
+    flex: 1, // Take up most of the width
   },
   iconStyle: {
     fontSize: 22,
@@ -234,10 +237,11 @@ const styles = StyleSheet.create({
   buttonTO: {
     backgroundColor: "#3498db",
     paddingVertical: 10,
+    paddingHorizontal: 20,
     marginBottom: 5,
-    marginHorizontal: 20,
     borderRadius: 15,
-    width: "90%",
+    width: "90%", // Ensure responsiveness
+    alignSelf: "center", // Center align the button
   },
   buttonText: {
     color: "#fff",
