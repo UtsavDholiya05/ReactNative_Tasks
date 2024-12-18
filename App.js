@@ -13,6 +13,7 @@ import { FavoritesProvider } from "./Context/EditFavorite";
 import EditProfile from "./Screens/EditProfile";
 import Welcome from "./Screens/Welcome";
 import ChatBot from "./Screens/ChatBot";
+import jwt from "./Screens/jwt"
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -32,6 +33,8 @@ function Tabs() {
             iconName = focused ? "person" : "person-outline";
           } else if (route.name === "ChatBot") {
             iconName = focused ? "chatbox" : "chatbox-outline";
+          } else if (route.name === "jwt") {
+            iconName = focused ? "chatbox" : "chatbox-outline";
           }
 
           return <Ionicons name={iconName} size={size} color={color} />;
@@ -42,6 +45,7 @@ function Tabs() {
       <Tab.Screen name="Favourite" component={FavouriteScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
       <Tab.Screen name="ChatBot" component={ChatBot} />
+      <Tab.Screen name="jwt" component={jwt} />
     </Tab.Navigator>
   );
 }

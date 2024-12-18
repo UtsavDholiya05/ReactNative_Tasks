@@ -1,263 +1,172 @@
-import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  ActivityIndicator,
-  Alert,
-  StyleSheet,
-} from "react-native";
+import React, { createContext, useState, useContext, useEffect } from "react";
+import { View, Text, TextInput, Button, Image, Alert } from "react-native";
+import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const BASE_URL = "https://movieappbackend-hogp.onrender.com/api/register"; 
+// Base API URL
+const API_BASE_URL = "https://movieappbackend-hogp.onrender.com/api";
 
-const App = () => {
+// Create Authentication Context
+const AuthContext = createContext();
+
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [userData, setUserData] = useState({
-    name: "",
-    email: "",
-    password: "",
-  });
+
+  const login = async (email, password) => {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/login`, {
+        email,
+        password,
+      });
+      const { token } = response.data;
+      setToken(token);
+      await AsyncStorage.setItem("jwt_token", token);
+      await fetchUserProfile(token); // Fetch user details after login
+    } catch (error) {
+      Alert.alert(
+        "Login Failed",
+        error.response?.data?.message || "An error occurred"
+      );
+    }
+  };
+
+  const register = async (username, email, password) => {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/register`, {
+        username,
+        email,
+        password,
+      });
+      Alert.alert("Registration Successful", response.data.message);
+    } catch (error) {
+      Alert.alert(
+        "Registration Failed",
+        error.response?.data?.message || "An error occurred"
+      );
+    }
+  };
+
+  const fetchUserProfile = async (jwtToken) => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/user/profile`, {
+        headers: { Authorization: `Bearer ${jwtToken || token}` },
+      });
+      setUser(response.data.user);
+    } catch (error) {
+      Alert.alert("Error", "Failed to fetch user profile");
+    }
+  };
+
+  const logout = async () => {
+    setToken(null);
+    setUser(null);
+    await AsyncStorage.removeItem("jwt_token");
+  };
 
   useEffect(() => {
-    const getToken = async () => {
-      const storedToken = await AsyncStorage.getItem("@jwt_token");
+    const loadToken = async () => {
+      const storedToken = await AsyncStorage.getItem("jwt_token");
       if (storedToken) {
         setToken(storedToken);
+        await fetchUserProfile(storedToken);
       }
     };
-    getToken();
+    loadToken();
   }, []);
 
-  const handleInputChange = (field, value) => {
-    setUserData({ ...userData, [field]: value });
-  };
+  return (
+    <AuthContext.Provider value={{ user, token, login, register, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
 
-  const register = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch(`${BASE_URL}/register`, {
-        method: "POST",
+export const useAuth = () => useContext(AuthContext);
+
+// Upload Profile Picture
+const uploadProfilePicture = async (imageUri, token) => {
+  try {
+    const formData = new FormData();
+    formData.append("file", {
+      uri: imageUri,
+      name: "profile.jpg",
+      type: "image/jpeg",
+    });
+
+    const response = await axios.put(
+      `${API_BASE_URL}/user/profilePicture`,
+      formData,
+      {
         headers: {
-          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
         },
-        body: JSON.stringify(userData),
-      });
-      const data = await response.json();
-      if (response.ok) {
-        Alert.alert("Success", "Registration successful! Please log in.");
-      } else {
-        Alert.alert("Error", data.message || "Registration failed");
       }
-    } catch (error) {
-      Alert.alert("Error", "Something went wrong. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
+    );
+    return response.data;
+  } catch (error) {
+    Alert.alert(
+      "Error",
+      error.response?.data?.message || "Failed to update profile picture"
+    );
+  }
+};
 
-  const login = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch(`${BASE_URL}/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: userData.email,
-          password: userData.password,
-        }),
-      });
-      const data = await response.json();
-      if (response.ok) {
-        await AsyncStorage.setItem("@jwt_token", data.token);
-        setToken(data.token);
-        Alert.alert("Success", "Logged in successfully!");
-      } else {
-        Alert.alert("Error", data.message || "Login failed");
-      }
-    } catch (error) {
-      Alert.alert("Error", "Something went wrong. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
+// Main App Component
+const App = () => {
+  const { login, register, user, logout } = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("");
 
-  const getData = async () => {
-    try {
-      const response = await fetch(`${BASE_URL}/data`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const data = await response.json();
-      console.log(data);
-      Alert.alert("Data Retrieved", JSON.stringify(data));
-    } catch (error) {
-      Alert.alert("Error", "Failed to fetch data.");
-    }
-  };
-
-  const createData = async () => {
-    try {
-      const response = await fetch(`${BASE_URL}/data`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ key: "value" }),
-      });
-      const data = await response.json();
-      console.log(data);
-      Alert.alert("Success", "Data created successfully");
-    } catch (error) {
-      Alert.alert("Error", "Failed to create data.");
-    }
-  };
-
-  const updateData = async (id) => {
-    try {
-      const response = await fetch(`${BASE_URL}/data/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ key: "new value" }),
-      });
-      const data = await response.json();
-      console.log(data);
-      Alert.alert("Success", "Data updated successfully");
-    } catch (error) {
-      Alert.alert("Error", "Failed to update data.");
-    }
-  };
-
-  const patchData = async (id) => {
-    try {
-      const response = await fetch(`${BASE_URL}/data/${id}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ key: "partial update" }),
-      });
-      const data = await response.json();
-      console.log(data);
-      Alert.alert("Success", "Data patched successfully");
-    } catch (error) {
-      Alert.alert("Error", "Failed to patch data.");
-    }
-  };
-
-  const deleteData = async (id) => {
-    try {
-      const response = await fetch(`${BASE_URL}/data/${id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (response.ok) {
-        Alert.alert("Success", "Data deleted successfully");
-      } else {
-        Alert.alert("Error", "Failed to delete data");
-      }
-    } catch (error) {
-      Alert.alert("Error", "Failed to delete data.");
-    }
-  };
+  const handleLogin = () => login(email, password);
+  const handleRegister = () => register(username, email, password);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>JWT Authentication Demo</Text>
-
-      <TextInput
-        style={styles.input}
-        placeholder="Name"
-        value={userData.name}
-        onChangeText={(text) => handleInputChange("name", text)}
-      />
-
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={userData.email}
-        onChangeText={(text) => handleInputChange("email", text)}
-        keyboardType="email-address"
-      />
-
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        value={userData.password}
-        onChangeText={(text) => handleInputChange("password", text)}
-        secureTextEntry
-      />
-
-      {loading ? (
-        <ActivityIndicator size="large" color="#0000ff" />
+    <View style={{ padding: 20 }}>
+      {user ? (
+        <View>
+          <Text>Welcome, {user.username}</Text>
+          {user.profilePicture && (
+            <Image
+              source={{ uri: user.profilePicture }}
+              style={{ width: 100, height: 100 }}
+            />
+          )}
+          <Button title="Logout" onPress={logout} />
+        </View>
       ) : (
-        <>
-          <TouchableOpacity style={styles.button} onPress={register}>
-            <Text style={styles.buttonText}>Register</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={login}>
-            <Text style={styles.buttonText}>Login</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={getData}>
-            <Text style={styles.buttonText}>Get Data</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={createData}>
-            <Text style={styles.buttonText}>Create Data</Text>
-          </TouchableOpacity>
-        </>
+        <View>
+          <TextInput
+            placeholder="Email"
+            value={email}
+            onChangeText={setEmail}
+            style={{ borderWidth: 1, marginBottom: 10 }}
+          />
+          <TextInput
+            placeholder="Password"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            style={{ borderWidth: 1, marginBottom: 10 }}
+          />
+          <TextInput
+            placeholder="Username (for Register)"
+            value={username}
+            onChangeText={setUsername}
+            style={{ borderWidth: 1, marginBottom: 10 }}
+          />
+          <Button title="Login" onPress={handleLogin} />
+          <Button title="Register" onPress={handleRegister} />
+        </View>
       )}
     </View>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 16,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 16,
-  },
-  input: {
-    height: 50,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    marginBottom: 10,
-    width: "100%",
-  },
-  button: {
-    backgroundColor: "#007bff",
-    height: 50,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 8,
-    marginTop: 10,
-    width: "100%",
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-});
-
-export default App;
+export default () => (
+  <AuthProvider>
+    <App />
+  </AuthProvider>
+);

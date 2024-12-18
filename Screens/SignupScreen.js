@@ -231,6 +231,7 @@ export default function SignupScreen({ navigation }) {
           {confirmpasswordError ? (
             <Text style={styles.errorText}>{confirmpasswordError}</Text>
           ) : null}
+          
         </View>
         <View
           style={{
