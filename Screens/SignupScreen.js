@@ -15,6 +15,8 @@ import { UserContext } from "../Context/Login";
 import * as ImagePicker from "expo-image-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Icon from "react-native-vector-icons/FontAwesome";
+import axios from "axios";
+import { API_BASE_URL } from "@env";
 
 export default function SignupScreen({ navigation }) {
   const [email, setEmail] = useState("");
@@ -91,6 +93,13 @@ export default function SignupScreen({ navigation }) {
       const userData = { Name, email, profilePhoto };
 
       try {
+        const response = await axios.post(`${API_BASE_URL}/register`, {
+          username: Name,
+          email,
+          password,
+        });
+        Alert.alert("Registration Successful", response.data.message);
+
         // Save user data to AsyncStorage
         await AsyncStorage.setItem("@user_data", JSON.stringify(userData));
 
@@ -101,8 +110,16 @@ export default function SignupScreen({ navigation }) {
           setLoading(false);
           navigation.navigate("Home");
         }, 1000);
-      } catch (e) {
-        console.error("Failed to save user data.", e);
+      } catch (error) {
+        console.log(
+          "Registration Error:",
+          error.message,
+          error.response?.data || "No additional data available."
+        );
+        Alert.alert(
+          "Registration Failed",
+          error.response?.data?.message || "An error occurred."
+        );
       }
     }
   };

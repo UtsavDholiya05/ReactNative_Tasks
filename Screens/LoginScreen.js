@@ -66,6 +66,8 @@ export default function LoginScreen({ navigation }) {
       await AsyncStorage.setItem("jwt_token", token);
       navigation.navigate("Home");
     } catch (error) {
+      console.log("Registration Error:", error.message, error.response?.data || "No additional data available.");
+
       Alert.alert(
         "Login Failed",
         error.response?.data?.message || "An error occurred."
@@ -83,47 +85,47 @@ export default function LoginScreen({ navigation }) {
   const AuthContext = createContext();
 
   // State for user and token
-  const AuthProvider = ({ children }) => 
-  {
-    const [user, setUser] = useState(null);
-    const [token, setToken] = useState(null);
+  // const AuthProvider = ({ children }) => 
+  // {
+  //   const [user, setUser] = useState(null);
+  //   const [token, setToken] = useState(null);
 
-    // Login function
-    const login = async (email, password) => {
-      try {
-        const response = await axios.post(`${API_BASE_URL}/login`, {
-          email,
-          password,
-        });
-        const { token } = response.data;
-        setToken(token);
-        await AsyncStorage.setItem("jwt_token", token);
-        await fetchUserProfile(token);
-      } catch (error) {
-        Alert.alert(
-          "Login Failed",
-          error.response?.data?.message || "An error occurred."
-        );
-      }
-    };
-    // Load token on component mount
-    useEffect(() => {
-      const loadToken = async () => {
-        const storedToken = await AsyncStorage.getItem("jwt_token");
-        if (storedToken) {
-          setToken(storedToken);
-          await fetchUserProfile(storedToken);
-        }
-      };
-      loadToken();
-    }, []);
+  //   // Login function
+  //   const login = async (email, password) => {
+  //     try {
+  //       const response = await axios.post(`${API_BASE_URL}/login`, {
+  //         email,
+  //         password,
+  //       });
+  //       const { token } = response.data;
+  //       setToken(token);
+  //       await AsyncStorage.setItem("jwt_token", token);
+  //       await fetchUserProfile(token);
+  //     } catch (error) {
+  //       Alert.alert(
+  //         "Login Failed",
+  //         error.response?.data?.message || "An error occurred."
+  //       );
+  //     }
+  //   };
+  //   // Load token on component mount
+  //   useEffect(() => {
+  //     const loadToken = async () => {
+  //       const storedToken = await AsyncStorage.getItem("jwt_token");
+  //       if (storedToken) {
+  //         setToken(storedToken);
+  //         await fetchUserProfile(storedToken);
+  //       }
+  //     };
+  //     loadToken();
+  //   }, []);
 
-    return (
-      <AuthContext.Provider value={{ user, token, login, register, logout }}>
-        {children}
-      </AuthContext.Provider>
-    );
-  };
+  //   return (
+  //     <AuthContext.Provider value={{ user, token, login, register, logout }}>
+  //       {children}
+  //     </AuthContext.Provider>
+  //   );
+  // };
 
   return (
     <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>

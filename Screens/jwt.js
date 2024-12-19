@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
-import { View, Text, Image, Button, Alert, StyleSheet } from "react-native";
+import { View, Text, Image, Button, Alert, StyleSheet, ActivityIndicator } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -13,7 +13,31 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
-  const [loading, setLoading] = useState(true); // Add loading state
+  const [loading, setLoading] = useState(true);
+
+  // Register User
+  const register = async (userData) => {
+    try {
+      setLoading(true);
+      const response = await fetch(`${API_BASE_URL}/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userData),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        Alert.alert("Success", "Registration successful! Please log in.");
+      } else {
+        Alert.alert("Error", data.message || "Registration failed.");
+      }
+    } catch (error) {
+      Alert.alert("Error", "Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Fetch User Data
   const fetchUserProfile = async (jwtToken) => {
@@ -23,12 +47,16 @@ export const AuthProvider = ({ children }) => {
       });
       setUser(response.data.user);
     } catch (error) {
-      Alert.alert("Error", "Failed to fetch user profile");
+      Alert.alert("Error", "Failed to fetch user profile.");
     }
   };
 
   // Upload Profile Picture
   const uploadProfilePicture = async (imageUri) => {
+    if (!token) {
+      Alert.alert("Error", "Authentication token is missing.");
+      return;
+    }
     try {
       const formData = new FormData();
       formData.append("file", {
@@ -43,16 +71,15 @@ export const AuthProvider = ({ children }) => {
         {
           headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
           },
         }
       );
       await fetchUserProfile(); // Refresh user data after updating
-      Alert.alert("Success", "Profile picture updated successfully");
+      Alert.alert("Success", "Profile picture updated successfully.");
     } catch (error) {
       Alert.alert(
         "Error",
-        error.response?.data?.message || "Failed to update profile picture"
+        error.response?.data?.message || "Failed to update profile picture."
       );
     }
   };
@@ -81,7 +108,7 @@ export const AuthProvider = ({ children }) => {
       } catch (error) {
         Alert.alert("Error", "Failed to load token.");
       } finally {
-        setLoading(false); // Set loading to false after token check
+        setLoading(false);
       }
     };
     loadToken();
@@ -89,7 +116,7 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, uploadProfilePicture, logout, loading }}
+      value={{ user, uploadProfilePicture, logout, loading, register }}
     >
       {children}
     </AuthContext.Provider>
@@ -125,7 +152,11 @@ const App = () => {
   };
 
   if (loading) {
-    return <Text>Loading...</Text>; // Show loading state while checking token
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
   }
 
   return (
@@ -133,7 +164,6 @@ const App = () => {
       {user ? (
         <View style={styles.profileContainer}>
           <Text style={styles.greeting}>Welcome, {user.username}</Text>
-
           {user.profilePicture ? (
             <Image
               source={{ uri: user.profilePicture }}
@@ -145,7 +175,6 @@ const App = () => {
               style={styles.profileImage}
             />
           )}
-
           <Button
             title="Upload New Profile Picture"
             onPress={handleUploadPhoto}
@@ -191,5 +220,10 @@ const styles = StyleSheet.create({
   infoText: {
     fontSize: 16,
     marginTop: 10,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
