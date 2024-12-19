@@ -104,7 +104,7 @@ export default function SignupScreen({ navigation }) {
         await AsyncStorage.setItem("@user_data", JSON.stringify(userData));
 
         // Update context with the new user data
-        setUser(userData);
+        // setUser(userData);
         setTimeout(() => {
           alert("Sign up Successful!");
           setLoading(false);
