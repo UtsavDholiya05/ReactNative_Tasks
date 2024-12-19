@@ -147,50 +147,6 @@ export default function SignupScreen({ navigation }) {
     setShowPassword(!showPassword);
   };
 
-  // Create AuthContext
-  const AuthContext = createContext();
-
-  // State for user and token
-  const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
-    const [token, setToken] = useState(null);
-
-    // Registration function
-    const register = async (Name, email, password) => {
-      try {
-        const response = await axios.post(`${API_BASE_URL}/register`, {
-          Name,
-          email,
-          password,
-        });
-        Alert.alert("Registration Successful", response.data.message);
-      } catch (error) {
-        Alert.alert(
-          "Registration Failed",
-          error.response?.data?.message || "An error occurred."
-        );
-      }
-    };
-
-    // Load token on component mount
-    useEffect(() => {
-      const loadToken = async () => {
-        const storedToken = await AsyncStorage.getItem("jwt_token");
-        if (storedToken) {
-          setToken(storedToken);
-          await fetchUserProfile(storedToken);
-        }
-      };
-      loadToken();
-    }, []);
-
-    return (
-      <AuthContext.Provider value={{ user, token, login, register, logout }}>
-        {children}
-      </AuthContext.Provider>
-    );
-  };
-
   return (
     <ScrollView keyboardShouldPersistTaps="handled">
       <ImageBackground
