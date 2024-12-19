@@ -7,13 +7,14 @@ import {
   TouchableOpacity,
   ImageBackground,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import { useState } from "react";
 import Icon from "react-native-vector-icons/FontAwesome";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { API_BASE_URL } from "@env";
-import React, { createContext, useEffect } from "react";
+import React from "react";
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState("");
@@ -22,6 +23,7 @@ export default function LoginScreen({ navigation }) {
   const [passwordError, setPasswordError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   // Email validation regex
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -66,12 +68,10 @@ export default function LoginScreen({ navigation }) {
       await AsyncStorage.setItem("jwt_token", token);
       navigation.navigate("Home");
     } catch (error) {
-      console.log("Registration Error:", error.message, error.response?.data || "No additional data available.");
+      console.log("Login Error:", error.message, error.response?.data || "No additional data available.");
 
-      Alert.alert(
-        "Login Failed",
-        error.response?.data?.message || "An error occurred."
-      );
+      // Display error message on screen
+      setErrorMessage(error.response?.data?.message || "An error occurred.");
     } finally {
       setLoading(false);
     }
@@ -80,52 +80,6 @@ export default function LoginScreen({ navigation }) {
   const togglePasswordVisibility = () => {
     setShowPassword((prevState) => !prevState); // Properly toggle the boolean state
   };
-
-  // Create AuthContext
-  const AuthContext = createContext();
-
-  // State for user and token
-  // const AuthProvider = ({ children }) => 
-  // {
-  //   const [user, setUser] = useState(null);
-  //   const [token, setToken] = useState(null);
-
-  //   // Login function
-  //   const login = async (email, password) => {
-  //     try {
-  //       const response = await axios.post(`${API_BASE_URL}/login`, {
-  //         email,
-  //         password,
-  //       });
-  //       const { token } = response.data;
-  //       setToken(token);
-  //       await AsyncStorage.setItem("jwt_token", token);
-  //       await fetchUserProfile(token);
-  //     } catch (error) {
-  //       Alert.alert(
-  //         "Login Failed",
-  //         error.response?.data?.message || "An error occurred."
-  //       );
-  //     }
-  //   };
-  //   // Load token on component mount
-  //   useEffect(() => {
-  //     const loadToken = async () => {
-  //       const storedToken = await AsyncStorage.getItem("jwt_token");
-  //       if (storedToken) {
-  //         setToken(storedToken);
-  //         await fetchUserProfile(storedToken);
-  //       }
-  //     };
-  //     loadToken();
-  //   }, []);
-
-  //   return (
-  //     <AuthContext.Provider value={{ user, token, login, register, logout }}>
-  //       {children}
-  //     </AuthContext.Provider>
-  //   );
-  // };
 
   return (
     <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
@@ -169,6 +123,7 @@ export default function LoginScreen({ navigation }) {
         </View>
 
         {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
+        {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
 
         <View style={styles.inputContainer}>
           <TextInput
@@ -190,6 +145,7 @@ export default function LoginScreen({ navigation }) {
           <Text style={styles.errorText}>{passwordError}</Text>
         ) : null}
 
+
         <View
           style={{
             alignItems: "flex-end",
@@ -207,7 +163,7 @@ export default function LoginScreen({ navigation }) {
             style={[
               styles.buttonTO,
               { justifyContent: "center", alignItems: "center" },
-            ]} // Centering the button
+            ]}
             onPress={handleSubmit}
             disabled={!email || !password || !!emailError || !!passwordError}
           >
