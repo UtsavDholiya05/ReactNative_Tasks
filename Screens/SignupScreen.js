@@ -10,7 +10,7 @@ import {
   Image,
   ActivityIndicator,
 } from "react-native";
-import { useContext, useState } from "react";
+import { useContext, useState, createContext } from "react";
 import { UserContext } from "../Context/Login";
 import * as ImagePicker from "expo-image-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -92,7 +92,7 @@ export default function SignupScreen({ navigation }) {
 
       try {
         // Save user data to AsyncStorage
-        await AsyncStorage.setItem("@user_daxta", JSON.stringify(userData));
+        await AsyncStorage.setItem("@user_data", JSON.stringify(userData));
 
         // Update context with the new user data
         setUser(userData);
@@ -128,6 +128,50 @@ export default function SignupScreen({ navigation }) {
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
+  };
+
+  // Create AuthContext
+  const AuthContext = createContext();
+
+  // State for user and token
+  const AuthProvider = ({ children }) => {
+    const [user, setUser] = useState(null);
+    const [token, setToken] = useState(null);
+
+    // Registration function
+    const register = async (Name, email, password) => {
+      try {
+        const response = await axios.post(`${API_BASE_URL}/register`, {
+          Name,
+          email,
+          password,
+        });
+        Alert.alert("Registration Successful", response.data.message);
+      } catch (error) {
+        Alert.alert(
+          "Registration Failed",
+          error.response?.data?.message || "An error occurred."
+        );
+      }
+    };
+
+    // Load token on component mount
+    useEffect(() => {
+      const loadToken = async () => {
+        const storedToken = await AsyncStorage.getItem("jwt_token");
+        if (storedToken) {
+          setToken(storedToken);
+          await fetchUserProfile(storedToken);
+        }
+      };
+      loadToken();
+    }, []);
+
+    return (
+      <AuthContext.Provider value={{ user, token, login, register, logout }}>
+        {children}
+      </AuthContext.Provider>
+    );
   };
 
   return (
@@ -231,7 +275,6 @@ export default function SignupScreen({ navigation }) {
           {confirmpasswordError ? (
             <Text style={styles.errorText}>{confirmpasswordError}</Text>
           ) : null}
-          
         </View>
         <View
           style={{

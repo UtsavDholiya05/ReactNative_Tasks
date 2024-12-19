@@ -10,13 +10,17 @@ import {
 } from "react-native";
 import { useState } from "react";
 import Icon from "react-native-vector-icons/FontAwesome";
+import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { API_BASE_URL } from "@env";
+import React, { createContext, useEffect } from "react";
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
-  const [showPassword, setShowPassword] = useState(false); // Ensure this is a boolean
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
   // Email validation regex
@@ -45,26 +49,86 @@ export default function LoginScreen({ navigation }) {
     validatePassword(password);
 
     if (emailError || passwordError || !email || !password) {
-      return; // Stop further execution if there's any validation error
+      return;
     }
 
     setLoading(true);
 
-    setTimeout(() => {
-      alert("Login Successful!");
-      setLoading(false);
+    try {
+      const response = await axios.post(`${API_BASE_URL}/login`, {
+        email,
+        password,
+      });
+
+      const { token } = response.data;
+
+      // Save token to AsyncStorage
+      await AsyncStorage.setItem("jwt_token", token);
       navigation.navigate("Home");
-    }, 1000);
+    } catch (error) {
+      Alert.alert(
+        "Login Failed",
+        error.response?.data?.message || "An error occurred."
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   const togglePasswordVisibility = () => {
     setShowPassword((prevState) => !prevState); // Properly toggle the boolean state
   };
 
+  // Create AuthContext
+  const AuthContext = createContext();
+
+  // State for user and token
+  const AuthProvider = ({ children }) => 
+  {
+    const [user, setUser] = useState(null);
+    const [token, setToken] = useState(null);
+
+    // Login function
+    const login = async (email, password) => {
+      try {
+        const response = await axios.post(`${API_BASE_URL}/login`, {
+          email,
+          password,
+        });
+        const { token } = response.data;
+        setToken(token);
+        await AsyncStorage.setItem("jwt_token", token);
+        await fetchUserProfile(token);
+      } catch (error) {
+        Alert.alert(
+          "Login Failed",
+          error.response?.data?.message || "An error occurred."
+        );
+      }
+    };
+    // Load token on component mount
+    useEffect(() => {
+      const loadToken = async () => {
+        const storedToken = await AsyncStorage.getItem("jwt_token");
+        if (storedToken) {
+          setToken(storedToken);
+          await fetchUserProfile(storedToken);
+        }
+      };
+      loadToken();
+    }, []);
+
+    return (
+      <AuthContext.Provider value={{ user, token, login, register, logout }}>
+        {children}
+      </AuthContext.Provider>
+    );
+  };
+
   return (
     <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
       <ImageBackground
-        source={require("../t/WhatsApp Image 2024-09-28 at 21.29.25_158d91f3.jpg")} 
+        source={require("../t/WhatsApp Image 2024-09-28 at 21.29.25_158d91f3.jpg")}
         style={{ height: "100%", width: "100%" }}
       >
         <Text
@@ -138,7 +202,10 @@ export default function LoginScreen({ navigation }) {
 
         <View>
           <TouchableOpacity
-            style={[styles.buttonTO, { justifyContent: "center", alignItems: "center" }]} // Centering the button
+            style={[
+              styles.buttonTO,
+              { justifyContent: "center", alignItems: "center" },
+            ]} // Centering the button
             onPress={handleSubmit}
             disabled={!email || !password || !!emailError || !!passwordError}
           >

@@ -13,7 +13,9 @@ import { FavoritesProvider } from "./Context/EditFavorite";
 import EditProfile from "./Screens/EditProfile";
 import Welcome from "./Screens/Welcome";
 import ChatBot from "./Screens/ChatBot";
-import jwt from "./Screens/jwt"
+import jwt from "./Screens/jwt";
+// import { AuthProvider } from "./Screens/jwt";
+import HomePage from "./Screens/HomePage";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -64,6 +66,7 @@ function ProfileComponent() {
 
 export default function App() {
   return (
+    // <AuthProvider>
     <UserProvider>
       <FavoritesProvider>
         <NavigationContainer>
@@ -71,6 +74,7 @@ export default function App() {
             <Stack.Screen name="Login" component={LoginScreen} />
             <Stack.Screen name="Sign Up" component={SignupScreen} />
             <Stack.Screen name="Welcome" component={Welcome} />
+            <Stack.Screen name="HomePage" component={HomePage} />
 
             <Stack.Screen
               name="Home"
@@ -86,5 +90,6 @@ export default function App() {
         </NavigationContainer>
       </FavoritesProvider>
     </UserProvider>
+    //  </AuthProvider>
   );
 }

@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
-import { View, Text, TextInput, Button, Image, Alert } from "react-native";
+import { View, Text, Image, Button, Alert, StyleSheet } from "react-native";
+import * as ImagePicker from "expo-image-picker";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -12,41 +13,9 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
+  const [loading, setLoading] = useState(true); // Add loading state
 
-  const login = async (email, password) => {
-    try {
-      const response = await axios.post(`${API_BASE_URL}/login`, {
-        email,
-        password,
-      });
-      const { token } = response.data;
-      setToken(token);
-      await AsyncStorage.setItem("jwt_token", token);
-      await fetchUserProfile(token); // Fetch user details after login
-    } catch (error) {
-      Alert.alert(
-        "Login Failed",
-        error.response?.data?.message || "An error occurred"
-      );
-    }
-  };
-
-  const register = async (username, email, password) => {
-    try {
-      const response = await axios.post(`${API_BASE_URL}/register`, {
-        username,
-        email,
-        password,
-      });
-      Alert.alert("Registration Successful", response.data.message);
-    } catch (error) {
-      Alert.alert(
-        "Registration Failed",
-        error.response?.data?.message || "An error occurred"
-      );
-    }
-  };
-
+  // Fetch User Data
   const fetchUserProfile = async (jwtToken) => {
     try {
       const response = await axios.get(`${API_BASE_URL}/user/profile`, {
@@ -58,25 +27,70 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = async () => {
-    setToken(null);
-    setUser(null);
-    await AsyncStorage.removeItem("jwt_token");
+  // Upload Profile Picture
+  const uploadProfilePicture = async (imageUri) => {
+    try {
+      const formData = new FormData();
+      formData.append("file", {
+        uri: imageUri,
+        name: "profile.jpg",
+        type: "image/jpeg",
+      });
+
+      const response = await axios.put(
+        `${API_BASE_URL}/user/profilePicture`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      await fetchUserProfile(); // Refresh user data after updating
+      Alert.alert("Success", "Profile picture updated successfully");
+    } catch (error) {
+      Alert.alert(
+        "Error",
+        error.response?.data?.message || "Failed to update profile picture"
+      );
+    }
   };
 
+  // Logout Function
+  const logout = async () => {
+    try {
+      await AsyncStorage.removeItem("jwt_token");
+      setUser(null);
+      setToken(null);
+      Alert.alert("Success", "You have been logged out.");
+    } catch (error) {
+      Alert.alert("Error", "Failed to log out.");
+    }
+  };
+
+  // Load Token from AsyncStorage
   useEffect(() => {
     const loadToken = async () => {
-      const storedToken = await AsyncStorage.getItem("jwt_token");
-      if (storedToken) {
-        setToken(storedToken);
-        await fetchUserProfile(storedToken);
+      try {
+        const storedToken = await AsyncStorage.getItem("jwt_token");
+        if (storedToken) {
+          setToken(storedToken);
+          await fetchUserProfile(storedToken);
+        }
+      } catch (error) {
+        Alert.alert("Error", "Failed to load token.");
+      } finally {
+        setLoading(false); // Set loading to false after token check
       }
     };
     loadToken();
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, token, login, register, logout }}>
+    <AuthContext.Provider
+      value={{ user, uploadProfilePicture, logout, loading }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -84,82 +98,63 @@ export const AuthProvider = ({ children }) => {
 
 export const useAuth = () => useContext(AuthContext);
 
-// Upload Profile Picture
-const uploadProfilePicture = async (imageUri, token) => {
-  try {
-    const formData = new FormData();
-    formData.append("file", {
-      uri: imageUri,
-      name: "profile.jpg",
-      type: "image/jpeg",
-    });
-
-    const response = await axios.put(
-      `${API_BASE_URL}/user/profilePicture`,
-      formData,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
-    return response.data;
-  } catch (error) {
-    Alert.alert(
-      "Error",
-      error.response?.data?.message || "Failed to update profile picture"
-    );
-  }
-};
-
 // Main App Component
 const App = () => {
-  const { login, register, user, logout } = useAuth();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [username, setUsername] = useState("");
+  const { user, uploadProfilePicture, logout, loading } = useAuth();
 
-  const handleLogin = () => login(email, password);
-  const handleRegister = () => register(username, email, password);
+  const handleUploadPhoto = async () => {
+    const permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (permissionResult.granted === false) {
+      Alert.alert(
+        "Permission Denied",
+        "You need to grant permissions to upload a photo."
+      );
+      return;
+    }
+
+    const pickerResult = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 1,
+    });
+
+    if (!pickerResult.canceled) {
+      uploadProfilePicture(pickerResult.assets[0].uri);
+    }
+  };
+
+  if (loading) {
+    return <Text>Loading...</Text>; // Show loading state while checking token
+  }
 
   return (
-    <View style={{ padding: 20 }}>
+    <View style={styles.container}>
       {user ? (
-        <View>
-          <Text>Welcome, {user.username}</Text>
-          {user.profilePicture && (
+        <View style={styles.profileContainer}>
+          <Text style={styles.greeting}>Welcome, {user.username}</Text>
+
+          {user.profilePicture ? (
             <Image
               source={{ uri: user.profilePicture }}
-              style={{ width: 100, height: 100 }}
+              style={styles.profileImage}
+            />
+          ) : (
+            <Image
+              source={require("../t/ProfileLogo.png")}
+              style={styles.profileImage}
             />
           )}
-          <Button title="Logout" onPress={logout} />
+
+          <Button
+            title="Upload New Profile Picture"
+            onPress={handleUploadPhoto}
+          />
+          <Text style={styles.infoText}>Email: {user.email}</Text>
+          <Button title="Logout" onPress={logout} color="red" />
         </View>
       ) : (
-        <View>
-          <TextInput
-            placeholder="Email"
-            value={email}
-            onChangeText={setEmail}
-            style={{ borderWidth: 1, marginBottom: 10 }}
-          />
-          <TextInput
-            placeholder="Password"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-            style={{ borderWidth: 1, marginBottom: 10 }}
-          />
-          <TextInput
-            placeholder="Username (for Register)"
-            value={username}
-            onChangeText={setUsername}
-            style={{ borderWidth: 1, marginBottom: 10 }}
-          />
-          <Button title="Login" onPress={handleLogin} />
-          <Button title="Register" onPress={handleRegister} />
-        </View>
+        <Text>No user logged in. Please log in again.</Text>
       )}
     </View>
   );
@@ -170,3 +165,31 @@ export default () => (
     <App />
   </AuthProvider>
 );
+
+// Styles
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  profileContainer: {
+    alignItems: "center",
+  },
+  greeting: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  profileImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginBottom: 10,
+  },
+  infoText: {
+    fontSize: 16,
+    marginTop: 10,
+  },
+});
