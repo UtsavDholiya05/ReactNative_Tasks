@@ -97,10 +97,20 @@
         console.log("User Data:", userData);
     
         try {
-          const response = await axios.post(`${API_BASE_URL}/register`, {
-            username: Name,
-            email,
-            password,
+          const formData = new FormData();
+          formData.append("username", Name);
+          formData.append("email", email);
+          formData.append("password", password);
+          formData.append("profilePhoto", {
+            uri: profilePhoto,
+            type: "image/jpeg",
+            name: "profile.jpg",
+          });
+    
+          const response = await axios.post(`${API_BASE_URL}/register`, formData, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
           });
     
           // Log the API response
@@ -131,6 +141,7 @@
         }
       }
     };
+    
 
     const pickImage = async () => {
       let result = await ImagePicker.launchImageLibraryAsync({
