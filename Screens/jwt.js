@@ -46,6 +46,7 @@ export const AuthProvider = ({ children }) => {
         headers: { Authorization: `Bearer ${jwtToken || token}` },
       });
       setUser(response.data.user);
+      console.log("User Profile Picture URL:", response.data.user.profilePicture); // Log profile picture URL
     } catch (error) {
       Alert.alert("Error", "Failed to fetch user profile.");
     }
@@ -178,12 +179,13 @@ const App = () => {
           <Button
             title="Upload New Profile Picture"
             onPress={handleUploadPhoto}
+            color="#4CAF50"
           />
           <Text style={styles.infoText}>Email: {user.email}</Text>
-          <Button title="Logout" onPress={logout} color="red" />
+          <Button title="Logout" onPress={logout} color="#F44336" />
         </View>
       ) : (
-        <Text>No user logged in. Please log in again.</Text>
+        <Text style={styles.errorText}>No user logged in. Please log in again.</Text>
       )}
     </View>
   );
@@ -205,25 +207,41 @@ const styles = StyleSheet.create({
   },
   profileContainer: {
     alignItems: "center",
+    backgroundColor: "#F0F0F0",
+    padding: 20,
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
   },
   greeting: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: "bold",
     marginBottom: 10,
+    color: "#333",
   },
   profileImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    marginBottom: 10,
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    marginBottom: 15,
+    borderWidth: 2,
+    borderColor: "#4CAF50",
   },
   infoText: {
     fontSize: 16,
     marginTop: 10,
+    color: "#555",
+  },
+  errorText: {
+    fontSize: 16,
+    color: "#F44336",
   },
   loadingContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#F0F0F0",
   },
 });

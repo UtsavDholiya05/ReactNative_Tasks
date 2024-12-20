@@ -1,4 +1,4 @@
-  import {
+import {
     StyleSheet,
     Text,
     TextInput,
@@ -17,7 +17,7 @@
   import Icon from "react-native-vector-icons/FontAwesome";
   import axios from "axios";
   import { API_BASE_URL } from "@env";
-
+  
   export default function SignupScreen({ navigation }) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -28,15 +28,13 @@
     const [showPassword, setShowPassword] = useState(false);
     const [Name, setName] = useState("");
     const [NameError, setNameError] = useState("");
-    // const [number, setNumber] = useState("");
-    // const [numberError, setNumberError] = useState("");
     const [profilePhoto, setprofilePhoto] = useState(null);
     const [loading, setLoading] = useState(false);
-
-    // Email validation regex
+    const [imageUri, setImageUri] = useState(null);
+  
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const { user, setUser } = useContext(UserContext);
-
+  
     const validateName = (name) => {
       setName(name);
       if (name.length < 2) {
@@ -45,7 +43,7 @@
         setNameError("");
       }
     };
-
+  
     const validateEmail = (email) => {
       setEmail(email);
       if (!emailRegex.test(email)) {
@@ -54,7 +52,7 @@
         setEmailError("");
       }
     };
-
+  
     const validatePassword = (password) => {
       setPassword(password);
       if (password.length < 6) {
@@ -63,7 +61,7 @@
         setPasswordError("");
       }
     };
-
+  
     const validateConfirmPassword = (confirmPassword) => {
       setConfirmPassword(confirmPassword);
       if (confirmPassword !== password) {
@@ -72,13 +70,12 @@
         setConfirmPasswordError("");
       }
     };
-
     const handleSubmit = async () => {
       validateName(Name);
       validateEmail(email);
       validatePassword(password);
       validateConfirmPassword(confirmpassword);
-
+    
       setLoading(true);
       if (
         !NameError &&
@@ -90,26 +87,56 @@
         password &&
         confirmpassword
       ) {
-        const userData = { Name, email, profilePhoto };
-
+        const userData = { Name, email, password };
+    
         try {
-          const response = await axios.post(`${API_BASE_URL}/register`, {
-            username: Name,
-            email,
-            password,
-          });
-          Alert.alert("Registration Successful", response.data.message);
-
-          // Save user data to AsyncStorage
-          await AsyncStorage.setItem("@user_data", JSON.stringify(userData));
-
-          // Update context with the new user data
-          // setUser(userData);
-          setTimeout(() => {
-            alert("Sign up Successful!");
-            setLoading(false);
-            navigation.navigate("Home");
-          }, 1000);
+          const formData = new FormData();
+          formData.append("username", Name);
+          formData.append("email", email);
+          formData.append("password", password);
+    
+          if (profilePhoto) {
+            formData.append("profilePhoto", {
+              uri: profilePhoto,
+              type: "image/jpeg", // Use appropriate mime type based on the image format
+              name: "profile.jpg", // Use appropriate file name
+            });
+    
+            // Use PUT request for profile picture update
+            const response = await axios.put(
+              `${API_BASE_URL}/user/profilePicture`, // Replace with your API endpoint
+              formData,
+              {
+                headers: {
+                  "Content-Type": "multipart/form-data",
+                  Authorization: `Bearer ${jwt_token}`, // Replace with the user's JWT token
+                },
+              }
+            );
+    
+            Alert.alert("Profile Updated", response.data.message);
+          } else {
+            // Use POST request for user registration
+            const response = await axios.post(`${API_BASE_URL}/register`, formData, {
+              headers: {
+                "Content-Type": "multipart/form-data",
+                Authorization: `Bearer ${jwt_token}`, // Replace with the user's JWT token
+              },
+            });
+    
+            Alert.alert("Registration Successful", response.data.message);
+    
+            // Save user data to AsyncStorage
+            await AsyncStorage.setItem("@user_data", JSON.stringify(userData));
+    
+            // Update context with the new user data
+            setUser(userData);
+            setTimeout(() => {
+              alert("Sign up Successful!");
+              setLoading(false);
+              navigation.navigate("Home");
+            }, 1000);
+          }
         } catch (error) {
           console.log(
             "Registration Error:",
@@ -123,7 +150,8 @@
         }
       }
     };
-
+    
+  
     const pickImage = async () => {
       let result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -131,10 +159,11 @@
         aspect: [1, 1],
         quality: 1,
       });
-
+  
       if (!result.canceled) {
         setprofilePhoto(result.assets[0].uri);
-
+        setImageUri(result.uri);
+  
         Alert.alert(
           "Photo Uploaded",
           "Your profile picture has been successfully uploaded!",
@@ -142,11 +171,11 @@
         );
       }
     };
-
+  
     const togglePasswordVisibility = () => {
       setShowPassword(!showPassword);
     };
-
+  
     return (
       <ScrollView keyboardShouldPersistTaps="handled">
         <ImageBackground
@@ -154,7 +183,7 @@
           style={{ height: "100%", width: "100%" }}
         >
           <Text style={styles.txt}>Sign Up</Text>
-
+  
           <Text
             style={{
               color: "#D5F2E3",
@@ -167,7 +196,7 @@
           >
             Create a new account
           </Text>
-
+  
           <TouchableOpacity onPress={pickImage}>
             <View style={styles.profile}>
               {profilePhoto ? (
@@ -184,41 +213,27 @@
               <Text style={styles.textButton}> Upload Your Profile Photo</Text>
             </View>
           </TouchableOpacity>
-
+  
           <View>
             <TextInput
               style={styles.input}
               placeholder="Your Name"
               onChangeText={validateName}
             />
-
+  
             {NameError ? <Text style={styles.errorText}>{NameError}</Text> : null}
-
+  
             <TextInput
               style={styles.input}
               placeholder="Email-address"
               keyboardType="email-address"
               onChangeText={validateEmail}
             />
-
+  
             {emailError ? (
               <Text style={styles.errorText}>{emailError}</Text>
             ) : null}
-
-            {/* <TextInput
-            style={styles.input}
-            placeholder="Contact Number"
-            keyboardType="number-pad"
-            onChangeText={(text) => {
-              setNumber(text);
-              setNumberError("");
-            }}
-            />
-
-            {numberError ? (
-              <Text style={styles.errorText}>{numberError}</Text>
-            ) : null} */}
-
+  
             <View style={styles.inputContainer}>
               <TextInput
                 style={styles.input1}
@@ -233,22 +248,23 @@
                 />
               </TouchableOpacity>
             </View>
-
+  
             {passwordError ? (
               <Text style={styles.errorText}>{passwordError}</Text>
             ) : null}
-
+  
             <TextInput
               style={styles.input}
               placeholder="Confirm password"
               secureTextEntry
               onChangeText={validateConfirmPassword}
             ></TextInput>
-
+  
             {confirmpasswordError ? (
               <Text style={styles.errorText}>{confirmpasswordError}</Text>
             ) : null}
           </View>
+  
           <View
             style={{
               display: "flex",
@@ -266,7 +282,7 @@
                 marginTop: 4,
               }}
             >
-              By sigining in, you agree to our{" "}
+              By signing in, you agree to our{" "}
             </Text>
             <Text
               style={{
@@ -279,13 +295,11 @@
               Terms & Conditions
             </Text>
           </View>
-
+  
           <View
             style={{
               display: "flex",
               flexDirection: "row",
-              // paddingRight: 16,
-              // width: "100%",
               marginBottom: 20,
               marginHorizontal: 27,
             }}
@@ -297,7 +311,7 @@
               Privacy Policy
             </Text>
           </View>
-
+  
           <View>
             <TouchableOpacity
               style={styles.buttonTO}
@@ -317,42 +331,34 @@
               {loading ? (
                 <ActivityIndicator size="small" color="#fff" />
               ) : (
-                <Text style={styles.buttonText}>Sign up</Text>
+                <Text style={styles.textButton}>Sign Up</Text>
               )}
             </TouchableOpacity>
           </View>
-
-          <View
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              justifyContent: "center",
-            }}
-          >
+  
+          <View>
             <Text
               style={{
                 color: "#fff",
                 fontSize: 16,
                 fontWeight: "bold",
-                marginVertical: 15,
+                marginTop: 8,
+                alignSelf: "center",
               }}
             >
               Already have an account?
             </Text>
-
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate("Login")}>
               <Text
                 style={{
                   color: "red",
                   fontSize: 16,
                   fontWeight: "bold",
-                  marginLeft: 3,
-                  marginVertical: 15,
+                  marginTop: 4,
+                  alignSelf: "center",
                 }}
-                onPress={() => navigation.navigate("Login")}
               >
-                {" "}
-                Login
+                Sign In
               </Text>
             </TouchableOpacity>
           </View>
@@ -360,111 +366,73 @@
       </ScrollView>
     );
   }
-
+  
   const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: "#f5f5f5",
-      // paddingHorizontal: 20,
-      // justifyContent: "center",
-    },
-    form: {
-      backgroundColor: "white",
-      padding: 20,
-      borderRadius: 10,
-      shadowColor: "black",
-      shadowOffset: {
-        width: 0,
-        height: 2,
-      },
-      shadowOpacity: 0.25,
-      shadowRadius: 4,
-      elevation: 5,
-    },
-    input: {
-      height: 45,
-      width: "90%",
-      alignSelf: "center",
-      // borderColor: "#ddd",
-      backgroundColor: "#fff",
-      marginBottom: 15,
-      paddingHorizontal: 10,
-      marginVertical: 10,
-      borderRadius: 100,
-    },
     txt: {
-      alignSelf: "center",
-      color: "#fff",
+      marginTop: 80,
+      fontSize: 40,
+      color: "#D5F2E3",
       fontWeight: "bold",
-      fontSize: 30,
-      marginTop: 23,
-      marginBottom: 12,
+      alignSelf: "center",
     },
-    viewButton: {
+    profile: {
+      display: "flex",
+      flexDirection: "column",
       justifyContent: "center",
       alignItems: "center",
-    },
-    buttonTO: {
-      backgroundColor: "#3498db",
-      paddingVertical: 10,
-      marginHorizontal: 20,
-      borderRadius: 15,
-      width: "90%",
-    },
-    buttonText: {
-      color: "#fff",
-      fontSize: 18,
-      textAlign: "center",
-    },
-    errorText: {
-      color: "red",
-      textAlign: "center", // Center the error message horizontally
-      marginBottom: 10,
-      width: "90%",
-      alignSelf: "center",
-      marginLeft: 17,
-    },
-    buttonPhoto: {
       backgroundColor: "#fff",
-      marginVertical: 10,
-      marginHorizontal: 20,
-      borderRadius: 100,
-    },
-    textButton: {
-      color: "#fff",
-      fontSize: 18,
-      marginBottom: 23,
+      padding: 8,
+      width: 150,
+      height: 150,
+      borderRadius: 80,
+      marginTop: 20,
     },
     profilePhoto: {
       width: 100,
       height: 100,
-      borderColor: "white",
-      borderWidth: 1.4,
-      borderRadius: 100,
-      marginVertical: 15,
-      alignSelf: "center",
+      borderRadius: 50,
     },
-    profile: {
-      alignSelf: "center",
-    },
-    iconStyle: {
-      fontSize: 22,
-      color: "black",
-    },
-    inputContainer: {
-      flexDirection: "row",
-      alignItems: "center",
-      height: 45,
-      width: "90%",
-      alignSelf: "center",
-      backgroundColor: "#fff",
-      marginBottom: 15,
-      paddingHorizontal: 10,
-      marginVertical: 10,
-      borderRadius: 100,
-      justifyContent: "space-between",
+    input: {
+      margin: 12,
+      height: 40,
+      borderColor: "gray",
+      borderWidth: 1,
+      color: "#D5F2E3",
+      borderRadius: 5,
+      paddingLeft: 10,
     },
     input1: {
       flex: 1,
+      margin: 12,
+      height: 40,
+      borderColor: "gray",
+      borderWidth: 1,
+      color: "#D5F2E3",
+      borderRadius: 5,
+      paddingLeft: 10,
+    },
+    iconStyle: {
+      color: "#D5F2E3",
+      fontSize: 20,
+      marginRight: 10,
+      marginLeft: 5,
+    },
+    buttonTO: {
+      alignItems: "center",
+      backgroundColor: "#FF5733",
+      padding: 10,
+      width: "90%",
+      borderRadius: 5,
+      margin: 10,
+    },
+    textButton: {
+      fontSize: 18,
+      color: "white",
+      fontWeight: "bold",
+    },
+    errorText: {
+      color: "red",
+      marginLeft: 14,
     },
   });
+  
