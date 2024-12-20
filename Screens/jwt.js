@@ -1,11 +1,9 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
-import { View, Text, Image, Button, Alert, StyleSheet, ActivityIndicator } from "react-native";
+import { View, Text, Image, Button, Alert, StyleSheet, ActivityIndicator, ScrollView } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
-// Base API URL
-const API_BASE_URL = "https://movieappbackend-hogp.onrender.com/api";
+import { API_BASE_URL } from "@env";
 
 // Create Authentication Context
 const AuthContext = createContext();
@@ -45,9 +43,10 @@ export const AuthProvider = ({ children }) => {
       const response = await axios.get(`${API_BASE_URL}/user/profile`, {
         headers: { Authorization: `Bearer ${jwtToken || token}` },
       });
+      console.log("Fetched User Profile:", response.data.user);
       setUser(response.data.user);
-      console.log("User Profile Picture URL:", response.data.user.profilePicture); // Log profile picture URL
     } catch (error) {
+      console.log("Error fetching user profile:", error);
       Alert.alert("Error", "Failed to fetch user profile.");
     }
   };
@@ -77,7 +76,9 @@ export const AuthProvider = ({ children }) => {
       );
       await fetchUserProfile(); // Refresh user data after updating
       Alert.alert("Success", "Profile picture updated successfully.");
+      console.log("Updated User Data:", response.data.user);
     } catch (error) {
+      console.log("Error updating profile picture:", error);
       Alert.alert(
         "Error",
         error.response?.data?.message || "Failed to update profile picture."
@@ -89,6 +90,7 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       await AsyncStorage.removeItem("jwt_token");
+
       setUser(null);
       setToken(null);
       Alert.alert("Success", "You have been logged out.");
@@ -161,7 +163,7 @@ const App = () => {
   }
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       {user ? (
         <View style={styles.profileContainer}>
           <Text style={styles.greeting}>Welcome, {user.username}</Text>
@@ -179,15 +181,15 @@ const App = () => {
           <Button
             title="Upload New Profile Picture"
             onPress={handleUploadPhoto}
-            color="#4CAF50"
+            color="#6200ee"
           />
           <Text style={styles.infoText}>Email: {user.email}</Text>
-          <Button title="Logout" onPress={logout} color="#F44336" />
+          <Button title="Logout" onPress={logout} color="red" />
         </View>
       ) : (
         <Text style={styles.errorText}>No user logged in. Please log in again.</Text>
       )}
-    </View>
+    </ScrollView>
   );
 };
 
@@ -201,47 +203,36 @@ export default () => (
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
     padding: 20,
   },
   profileContainer: {
     alignItems: "center",
-    backgroundColor: "#F0F0F0",
-    padding: 20,
-    borderRadius: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 3,
   },
   greeting: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 10,
-    color: "#333",
+    marginBottom: 20,
   },
   profileImage: {
     width: 120,
     height: 120,
     borderRadius: 60,
-    marginBottom: 15,
-    borderWidth: 2,
-    borderColor: "#4CAF50",
+    marginBottom: 20,
   },
   infoText: {
-    fontSize: 16,
+    fontSize: 18,
     marginTop: 10,
-    color: "#555",
+    color: "#333",
   },
   errorText: {
     fontSize: 16,
-    color: "#F44336",
+    color: "red",
+    textAlign: "center",
+    marginTop: 20,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#F0F0F0",
   },
 });
