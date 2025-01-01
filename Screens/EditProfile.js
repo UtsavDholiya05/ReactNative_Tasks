@@ -25,7 +25,7 @@ const EditProfile = () => {
         source={{ uri: user.profilePhoto }}
         style={{ width: 100, height: 100, borderRadius: 50 }}
       />
-      <Button title="Change Profile Picture" onPress={pickImage} />
+      <Button title="Change Profile " onPress={pickImage} />
     </View>
   );
 };

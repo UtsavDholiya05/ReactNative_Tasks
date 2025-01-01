@@ -133,7 +133,7 @@ import {
     return (
       <ScrollView keyboardShouldPersistTaps="handled">
         <ImageBackground
-          source={require("../t/WhatsApp Image 2024-09-28 at 21.29.25_158d91f3.jpg")}
+          // source={require("../t/WhatsApp Image 2024-09-28 at 21.29.25_158d91f3.jpg")}
           style={{ height: "100%", width: "100%" }}
         >
           <Text style={styles.txt}>Sign Up</Text>
