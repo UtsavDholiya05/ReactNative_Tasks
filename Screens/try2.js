@@ -1,68 +1,122 @@
-import React, { useState } from 'react';
-import { View, Button, Image, Alert } from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
-import axios from 'axios';
+// viedo accessing through api
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Button,
+  Text,
+  StyleSheet,
+  FlatList,
+  Alert,
+  TouchableOpacity,
+} from 'react-native';
+import { launchImageLibrary } from 'react-native-image-picker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const UpdateProfilePicture = () => {
-  const [imageUri, setImageUri] = useState(null);
+const VideoUploader = () => {
+  const [videos, setVideos] = useState([]);
+  const storageKey = 'user_videos'; // Key to store video paths in AsyncStorage
 
-  const selectImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
+  // Load saved videos when the app starts
+  useEffect(() => {
+    const loadVideos = async () => {
+      try {
+        const storedVideos = await AsyncStorage.getItem(storageKey);
+        if (storedVideos) {
+          setVideos(JSON.parse(storedVideos));
+        }
+      } catch (error) {
+        console.error('Error loading videos:', error);
+      }
+    };
+    loadVideos();
+  }, []);
+
+  // Pick a video
+  const pickVideo = () => {
+    const options = {
+      mediaType: 'video',
       quality: 1,
-    });
+    };
 
-    if (!result.canceled) {
-      setImageUri(result.assets[0].uri);
-    }
+    launchImageLibrary(options, async (response) => {
+      if (response.didCancel) {
+        console.log('User cancelled video picker');
+      } else if (response.errorCode) {
+        console.error('Error picking video:', response.errorMessage);
+      } else {
+        const video = response.assets[0];
+        saveVideoUri(video.uri);
+      }
+    });
   };
 
-  const uploadImage = async () => {
-    if (!imageUri) {
-      Alert.alert('Please select an image first');
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append('file', {
-      uri: imageUri,
-      type: 'image/jpeg', // or the appropriate type for your image
-      name: 'profile.jpg',
-    });
-
+  // Save the video URI and update the state
+  const saveVideoUri = async (uri) => {
     try {
-      const response = await axios.post('https://movieappbackend-hogp.onrender.com/api/register', formData, {
-        headers: {
-          "Authorization": "Bearer jwt_token", // Ensure this is the correct token
-          'key':'file',
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      const updatedVideos = [...videos, uri];
+      setVideos(updatedVideos);
+      await AsyncStorage.setItem(storageKey, JSON.stringify(updatedVideos));
 
-      if (response.data.success) {
-        Alert.alert('Profile picture updated successfully');
-      } else {
-        Alert.alert('Failed to update profile picture');
-      }
+      Alert.alert('Success', 'Video saved successfully!');
     } catch (error) {
-      console.error('Error uploading image: ', error);
-      if (error.response && error.response.status === 401) {
-        Alert.alert('Unauthorized: Please check your JWT token');
-      } else {
-        Alert.alert('Error uploading image');
-      }
+      console.error('Error saving video URI:', error);
+      Alert.alert('Error', 'Failed to save video.');
     }
   };
+
+  // Render each video item
+  const renderVideoItem = ({ item }) => (
+    <TouchableOpacity
+      onPress={() => Alert.alert('Video Path', item)}
+      style={styles.videoItem}
+    >
+      <Text style={styles.videoText}>{item.split('/').pop()}</Text>
+    </TouchableOpacity>
+  );
 
   return (
-    <View>
-      <Button title="Select Image" onPress={selectImage} />
-      {imageUri && <Image source={{ uri: imageUri }} style={{ width: 100, height: 100 }} />}
-      <Button title="Upload Image" onPress={uploadImage} />
+    <View style={styles.container}>
+      <Button title="Pick a Video" onPress={pickVideo} />
+      {videos.length > 0 ? (
+        <FlatList
+          data={videos}
+          renderItem={renderVideoItem}
+          keyExtractor={(item, index) => index.toString()}
+          style={styles.videoList}
+        />
+      ) : (
+        <Text style={styles.noVideosText}>No videos saved yet.</Text>
+      )}
     </View>
   );
 };
 
-export default UpdateProfilePicture;
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+    backgroundColor: '#f9f9f9',
+  },
+  videoList: {
+    marginTop: 20,
+    width: '100%',
+  },
+  videoItem: {
+    padding: 15,
+    backgroundColor: '#eaeaea',
+    borderRadius: 8,
+    marginBottom: 10,
+  },
+  videoText: {
+    color: '#333',
+  },
+  noVideosText: {
+    marginTop: 20,
+    color: '#888',
+    fontSize: 16,
+  },
+});
+
+export default VideoUploader;
