@@ -14,7 +14,7 @@ import EditProfile from "./Screens/EditProfile";
 import ChatBot from "./Screens/ChatBot";
 import jwt from "./Screens/jwt";
 import HomePage from "./Screens/HomePage"
-
+import try2 from "./Screens/try2"
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
@@ -46,6 +46,7 @@ function Tabs() {
       <Tab.Screen name="Profile" component={ProfileScreen} />
       <Tab.Screen name="ChatBot" component={ChatBot} />
       <Tab.Screen name="jwt" component={jwt} />
+      <Tab.Screen name="try2" component={try2} />
     </Tab.Navigator>
   );
 }
