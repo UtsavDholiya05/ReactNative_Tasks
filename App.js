@@ -45,8 +45,8 @@ function Tabs() {
       <Tab.Screen name="Favourite" component={FavouriteScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
       <Tab.Screen name="ChatBot" component={ChatBot} />
-      <Tab.Screen name="jwt" component={jwt} />
-      <Tab.Screen name="try2" component={try2} />
+      {/* <Tab.Screen name="jwt" component={jwt} /> */}
+      {/* <Tab.Screen name="try2" component={try2} /> */}
     </Tab.Navigator>
   );
 }
